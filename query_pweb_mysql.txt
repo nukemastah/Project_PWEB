@@ -1,0 +1,102 @@
+create table rekening (
+	koderekening varchar(5),
+	namarekening varchar(255),
+	saldo double,
+	primary key (koderekening)
+);
+
+create table pemasok (
+	kodepemasok varchar(5),
+	namapemasok varchar(50),
+	alamat varchar(255),
+	kota varchar(25),
+	telepon varchar(15),
+	email varchar(255),
+	primary key (kodepemasok)
+);
+
+create table item (
+	kodeitem varchar(5),
+	nama varchar(25),
+	hargabeli double,
+	hargajual double,
+	stok double,
+	satuan varchar(10),
+	primary key (kodeitem)
+);
+
+create table pelanggan (
+	kodepelanggan varchar(9),
+	namapelanggan varchar(50),
+	alamat varchar(50),
+	kota varchar(25),
+	telepon varchar(15),
+	email varchar(255),
+	primary key (kodepelanggan)
+);
+
+create table hjual (
+	nojual varchar(5),
+	tanggal date,
+	kodepelanggan varchar(9),
+	total double,
+	keterangan varchar(255),
+	primary key (nojual),
+	foreign key (kodepelanggan) references pelanggan(kodepelanggan)
+);
+
+create table hbeli (
+	nobeli varchar(5),
+	noref varchar(100),
+	tanggal date,
+	kodepemasok varchar(5),
+	total double,
+	keterangan varchar(255),
+	primary key (nobeli),
+	foreign key (kodepemasok) references pemasok(kodepemasok)
+);
+
+create table dbayarjual (
+	nojual varchar(5),
+	nomer_dbayarjual integer,
+	tanggal datetime,
+	totalbayar double,
+	keterangan varchar(255),
+	koderekening varchar(5),
+	primary key (nomer_dbayarjual),
+	foreign key (nojual) references hjual(nojual),
+	foreign key (koderekening) references rekening(koderekening)
+);
+
+create table dbayarbeli (
+	nobeli varchar(5),
+	nomer_dbayarbeli integer,
+	tanggal datetime,
+	totalbayar double,
+	keterangan varchar(255),
+	koderekening varchar(5),
+	primary key (nomer_dbayarbeli),
+	foreign key (nobeli) references hbeli(nobeli),
+	foreign key (koderekening) references rekening(koderekening)
+);
+
+create table djual (
+	nojual varchar(5),
+	nogenerate varchar(10),
+	qty double,
+	hargajual double,
+	primary key (nogenerate),
+	foreign key(nojual) references hjual(nojual)
+);
+
+create table dbeli (
+	nogenerate varchar(10),
+	nobeli varchar(5),
+	kodeitem varchar(5),
+	qty double,
+	hargabeli double,
+	stok double,
+	foreign key (nogenerate) references djual(nogenerate),
+	foreign key (nobeli) references hbeli(nobeli),
+	foreign key (kodeitem) references item(kodeitem)
+);
