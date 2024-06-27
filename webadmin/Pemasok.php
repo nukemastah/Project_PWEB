@@ -170,7 +170,11 @@
         <!-- End of Sidebar -->
 
         <!-- add button -->
-
+        <h1>Pencarian Nama Pemasok</h1>
+        <form method="get" action="">
+        <input type="text" name="search" placeholder="Masukkan nama pemasok">
+        <input type="submit" name="submit" value="Cari">
+        </form>
         <!-- ========================================================================================== -->
 
         <!-- Content Wrapper -->
@@ -215,7 +219,20 @@
     if (!$result_pemasok) {
         die("Error dalam query SQL: " . $conn->error);
     }
-    
+    // Query untuk mencari pemasok berdasarkan nama
+        $sql = "SELECT * FROM pemasok WHERE nama LIKE '%$search%'";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            echo "<h2>Hasil Pencarian:</h2>";
+            echo "<ul>";
+            while($row = $result->fetch_assoc()) {
+                echo "<li>" . $row['nama'] . "</li>";
+            }
+            echo "</ul>";
+        } else {
+            echo "Tidak ada pemasok yang ditemukan.";
+        }
     // Menampilkan tabel pemasok
     if ($result_pemasok->num_rows > 0) {
         echo '<h2>Data Pemasok</h2>';
