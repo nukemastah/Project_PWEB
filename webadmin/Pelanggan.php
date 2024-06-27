@@ -86,7 +86,7 @@
 
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link collapsed" href="php/Pelanggan.php" data-target="#collapseTwo"
+                <a class="nav-link collapsed" href="Pelanggan.php" data-target="#collapseTwo"
                     aria-expanded="true" aria-controls="collapseTwo">
                     <span>Pelanggan</span>
                 </a>
@@ -94,19 +94,19 @@
             <!-- Nav Item - Utilities Collapse Menu -->
             <li class="nav-item">
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="php/Pemasok.php" data-target="#collapseTwo"
+                    <a class="nav-link collapsed" href="Pemasok.php" data-target="#collapseTwo"
                         aria-expanded="true" aria-controls="collapseTwo">
                         <span>Pemasok</span>
                     </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link collapsed" href="php/Item.php" data-target="#collapseTwo"
+                <a class="nav-link collapsed" href="Item.php" data-target="#collapseTwo"
                     aria-expanded="true" aria-controls="collapseTwo">
                     <span>Item</span>
                 </a>
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="php/Rekening.php" data-target="#collapseTwo"
+                <a class="nav-link collapsed" href="Rekening.php" data-target="#collapseTwo"
                     aria-expanded="true" aria-controls="collapseTwo">
                     <span>Rekening</span>
                 </a>
