@@ -170,7 +170,11 @@
         <!-- End of Sidebar -->
 
         <!-- add button -->
-
+        <h1>Pencarian Nama Rekening</h1>
+        <form method="post" action="">
+        <input type="text" name="search" placeholder="Masukkan nama rekening">
+        <input type="submit" name="submit" value="Cari">
+        </form>
         <!-- ========================================================================================== -->
 
         <!-- Content Wrapper -->
@@ -228,7 +232,20 @@
             echo "<th>{$field->name}</th>";
         }
         echo "<th>Aksi</th></tr></thead><tbody>";
-    
+      // Query untuk mencari rekening berdasarkan nama
+        $sql = "SELECT * FROM rekening WHERE nama_rekening LIKE '%$search%'";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            echo "<h2>Hasil Pencarian:</h2>";
+            echo "<ul>";
+            while($row = $result->fetch_assoc()) {
+                echo "<li>" . $row['nama_rekening'] . "</li>";
+            }
+            echo "</ul>";
+        } else {
+            echo "Tidak ada rekening yang ditemukan.";
+        }
         // Menampilkan data baris demi baris
         while($row = $result_rekening->fetch_assoc()) {
             echo "<tr>";
