@@ -165,6 +165,11 @@
         <!-- End of Sidebar -->
 
         <!-- add button -->
+        <!-- Form pencarian -->
+        <form action="search.php" method="get">
+        <input type="text" name="kata_kunci" placeholder="Cari nama pelanggan">
+        <input type="submit" value="Cari">
+        </form>
 
         <!-- ========================================================================================== -->
 
@@ -206,11 +211,36 @@
     // Menjalankan query SQL
     $sql = "SELECT * FROM pelanggan";
     $result = $conn->query($sql);
-
+    
     if (!$result) {
         die("Error dalam query SQL: " . $conn->error);
     }
+    // Ambil kata kunci dari form pencarian
+    $kata_kunci = isset($_GET['kata_kunci']) ? $_GET['kata_kunci'] : '';
 
+    // Cek jika kata kunci tidak kosong
+    if (!empty($kata_kunci)) {
+    // Buat query pencarian
+    $query = "SELECT * FROM pelanggan WHERE nama LIKE ?";
+    $stmt = $koneksi->prepare($query);
+
+    // Siapkan parameter dan eksekusi
+    $param = "%" . $kata_kunci . "%";
+    $stmt->bind_param("s", $param);
+    $stmt->execute();
+
+    // Dapatkan hasilnya
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        // Output data dari setiap baris
+        while ($row = $result->fetch_assoc()) {
+            echo "ID: " . $row["id"] . ", Nama: " . $row["nama"] . "<br>";
+        }
+    } else {
+        echo "Data tidak ditemukan.";
+    }
+    }
     // Memeriksa apakah ada data
     if ($result->num_rows > 0) {
         echo '<table>
