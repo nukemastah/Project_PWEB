@@ -192,8 +192,6 @@
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                         <i class="fa fa-bars"></i>
                     </button>
-                    <h2>Item</h2>
-                    <button class="add">add</button>
             </div>
         </div>
 
@@ -212,11 +210,6 @@
     if ($conn->connect_error) {
         die("Koneksi gagal: " . $conn->connect_error);
     }
-    $search_item = $_GET['search_item'];
-
-    // Query pencarian (gantilah dengan query sesuai kebutuhan)
-    $query = "SELECT * FROM tabel_item WHERE nama_item LIKE '%$search_item%'";
-    $result = mysqli_query($conn, $query);
 
     // Tampilkan hasil pencarian
     while ($row = mysqli_fetch_assoc($result)) {
