@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 
+
+
 <head>
 
     <meta charset="utf-8">
@@ -17,7 +19,7 @@
         table {
             width: 66%;
             margin: auto;
-            margin-left: 120px;
+            margin-left: 340px;
             position: absolute;
             margin-top: 120px;
             border-collapse: collapse;
@@ -35,9 +37,10 @@
             text-decoration: none;
         }
 
-        button {
-            height: 50%;
-            width: 50%;
+        .add {
+            margin-top: 60px;
+            height: 20px;
+            width: 20;
         }
 
     </style>
@@ -187,12 +190,11 @@
                         <i class="fa fa-bars"></i>
                     </button>
                     <h2>Item</h2>
-                </div>
-                <!-- /.container-fluid -->
+                    <button class="add">add</button>
+            </div>
+        </div>
 
     <!-- tampilin tabel dari tabel pelanggan -->
-
-    <h2>Data Item</h2>
 
     <?php
     $servername = "localhost";
@@ -218,7 +220,6 @@
     
     // Menampilkan tabel item
     if ($result_item->num_rows > 0) {
-        echo '<h2>Data Item</h2>';
         echo '<table>
                 <thead>
                     <tr>';
@@ -249,7 +250,7 @@
     // Menutup koneksi
     $conn->close();
     ?>
-
+    </div>
     <!-- ============================================================================= -->
 
     <!-- End of Page Wrapper -->
@@ -257,7 +258,7 @@
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
-    </a>
+
 
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>

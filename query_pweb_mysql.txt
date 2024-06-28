@@ -100,3 +100,5 @@ create table dbeli (
 	foreign key (nobeli) references hbeli(nobeli),
 	foreign key (kodeitem) references item(kodeitem)
 );
+
+alter table pelanggan AUTO_INCREMENT=255;

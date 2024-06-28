@@ -17,7 +17,7 @@
         table {
             width: 66%;
             margin: auto;
-            margin-left: 120px;
+            margin-left: 340px;
             position: absolute;
             margin-top: 120px;
             border-collapse: collapse;
