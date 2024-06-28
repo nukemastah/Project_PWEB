@@ -121,7 +121,10 @@
 
             <!-- Divider -->
             <hr class="sidebar-divider">
-
+            <form action="item.php" method="GET">
+            <input type="text" name="search_item" placeholder="Nama Item">
+            <button type="submit">Cari</button>
+            </form>
             <!-- Heading -->
             <div class="sidebar-heading">
                 BELI
@@ -208,6 +211,17 @@
     // Memeriksa koneksi
     if ($conn->connect_error) {
         die("Koneksi gagal: " . $conn->connect_error);
+    }
+    $search_item = $_GET['search_item'];
+
+    // Query pencarian (gantilah dengan query sesuai kebutuhan)
+    $query = "SELECT * FROM tabel_item WHERE nama_item LIKE '%$search_item%'";
+    $result = mysqli_query($conn, $query);
+
+    // Tampilkan hasil pencarian
+    while ($row = mysqli_fetch_assoc($result)) {
+    echo $row['nama_item'] . "<br>";
+    // Tampilkan informasi lainnya sesuai kebutuhan
     }
 
     // Menjalankan query SQL untuk tabel item
