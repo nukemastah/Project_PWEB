@@ -11,9 +11,18 @@
 
     <title>SB Admin 2 - Dashboard</title>
 
-    <!-- CSS UNTUK TABEL -->
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
 
-    <style>
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+</head>
+
+<style>
         table {
             width: 66%;
             margin: auto;
@@ -42,19 +51,6 @@
 
     </style>
 
-    <!-- ================================================================================ -->
-
-    <!-- Custom fonts for this template-->
-    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
-
-    <!-- Custom styles for this template-->
-    <link href="css/sb-admin-2.min.css" rel="stylesheet">
-
-</head>
-
 <body id="page-top">
 
     <!-- Page Wrapper -->
@@ -73,11 +69,10 @@
 
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
-            
+
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
                 <a class="nav-link" href="index.html">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
             </li>
 
@@ -121,57 +116,16 @@
 
             <!-- Heading -->
             <div class="sidebar-heading">
-                BELI
+                TRANSAKSI
             </div>
 
             <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-target="#collapseTwo"
                     aria-expanded="true" aria-controls="collapseTwo">
-                    <span>hbeli</span>
+                    <span>Transaksi</span>
                 </a>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-target="#collapseTwo"
-                    aria-expanded="true" aria-controls="collapseTwo">
-                    <span>dbeli</span>
-                </a>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-target="#collapseTwo"
-                    aria-expanded="true" aria-controls="collapseTwo">
-                    <span>dbayarbeli</span>
-                </a>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                JUAL
-            </div>
-
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="#" data-target="#collapseTwo"
-                        aria-expanded="true" aria-controls="collapseTwo">
-                        <span>hjual</span>
-                    </a>
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="#" data-target="#collapseTwo"
-                        aria-expanded="true" aria-controls="collapseTwo">
-                        <span>djual</span>
-                </a>
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="#" data-target="#collapseTwo"
-                        aria-expanded="true" aria-controls="collapseTwo">
-                        <span>dbayarjual</span>
-                    </a>
-
         </ul>
         <!-- End of Sidebar -->
-
-        <!-- add button -->
-
-        <!-- ========================================================================================== -->
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
@@ -186,80 +140,54 @@
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                         <i class="fa fa-bars"></i>
                     </button>
-                    <h2>REKENING</h2>
+
+                    <!-- Topbar Search -->
+                    <form
+                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                        <div class="input-group">
+                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                                aria-label="Search" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                <div class="tampilan-konten">
+                    <h2>disini</h2>
                 </div>
+
+            </div>
                 <!-- /.container-fluid -->
-
-    <!-- tampilin tabel dari tabel pelanggan -->
-
-    <h2>Data REKENING</h2>
-
-    <?php
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "project_pweb";
-
-    // Membuat koneksi
-    $conn = new mysqli($servername, $username, $password, $dbname);
-
-    // Memeriksa koneksi
-    if ($conn->connect_error) {
-        die("Koneksi gagal: " . $conn->connect_error);
-    }
-
-    // Menjalankan query SQL untuk tabel rekening
-    $sql_rekening = "SELECT * FROM rekening";
-    $result_rekening = $conn->query($sql_rekening);
-    
-    if (!$result_rekening) {
-        die("Error dalam query SQL: " . $conn->error);
-    }
-    
-    // Menampilkan tabel rekening
-    if ($result_rekening->num_rows > 0) {
-        echo '<h2>Data Rekening</h2>';
-        echo '<table>
-                <thead>
-                    <tr>';
-        // Menampilkan header tabel berdasarkan nama kolom
-        $fields_rekening = $result_rekening->fetch_fields();
-        foreach ($fields_rekening as $field) {
-            echo "<th>{$field->name}</th>";
-        }
-        echo "<th>Aksi</th></tr></thead><tbody>";
-    
-        // Menampilkan data baris demi baris
-        while($row = $result_rekening->fetch_assoc()) {
-            echo "<tr>";
-            foreach ($row as $key => $value) {
-                echo "<td>$value</td>";
-            }
-            echo "<td class='actions'>
-                    <a class='edit' href='?action=edit&koderekening={$row['koderekening']}'>Edit</a>
-                    <a class='delete' href='?action=hapus&koderekening={$row['koderekening']}' onclick='return confirm(\"Anda yakin ingin menghapus data ini?\");'>Hapus</a>
-                  </td>";
-            echo "</tr>";
-        }
-        echo '</tbody></table>';
-    } else {
-        echo "<p>Tidak ada data ditemukan</p>";
-    }
-    
-
-    // Menutup koneksi
-    $conn->close();
-    ?>
-
-    <!-- ============================================================================= -->
-
+    </div>
     <!-- End of Page Wrapper -->
 
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
-        <h2>hello world</h2>
     </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="login.html">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
