@@ -121,10 +121,7 @@
 
             <!-- Divider -->
             <hr class="sidebar-divider">
-            <form action="item.php" method="GET">
-            <input type="text" name="search_item" placeholder="Nama Item">
-            <button type="submit">Cari</button>
-            </form>
+            
             <!-- Heading -->
             <div class="sidebar-heading">
                 BELI
@@ -176,7 +173,7 @@
         <!-- End of Sidebar -->
 
         <!-- add button -->
-
+        
         <!-- ========================================================================================== -->
 
         <!-- Content Wrapper -->
@@ -192,6 +189,10 @@
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                         <i class="fa fa-bars"></i>
                     </button>
+                    <form method="POST" action="">
+                    <input type="text" name="search" placeholder="Search by name">
+                    <button type="submit">Search</button>
+            </form>
             </div>
         </div>
 
@@ -211,11 +212,34 @@
         die("Koneksi gagal: " . $conn->connect_error);
     }
 
-    // Tampilkan hasil pencarian
-    while ($row = mysqli_fetch_assoc($result)) {
-    echo $row['nama_item'] . "<br>";
-    // Tampilkan informasi lainnya sesuai kebutuhan
-    }
+     // Prepare and execute the search query
+     $sql = $conn->prepare("SELECT * FROM item WHERE name LIKE ?");
+     $likeSearch = "%" . $search . "%";
+     $sql->bind_param("s", $likeSearch);
+     $sql->execute();
+     $result = $sql->get_result();
+
+     // Display the results
+     if ($result->num_rows > 0) {
+         echo "<table border='1'>
+                 <tr>
+                     <th>ID</th>
+                     <th>Name</th>
+                     <th>Description</th>
+                     <th>Price</th>
+                 </tr>";
+         while ($row = $result->fetch_assoc()) {
+             echo "<tr>
+                     <td>{$row['id']}</td>
+                     <td>{$row['name']}</td>
+                     <td>{$row['description']}</td>
+                     <td>{$row['price']}</td>
+                   </tr>";
+         }
+         echo "</table>";
+     } else {
+         echo "No items found";
+     }
 
     // Menjalankan query SQL untuk tabel item
     $sql_item = "SELECT * FROM item";
