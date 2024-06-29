@@ -189,9 +189,12 @@
                     <h2>PEMASOK</h2>
                 </div>
                 <!-- /.container-fluid -->
-
+                    <form method="POST" action="">
+                    <input type="text" name="search" placeholder="Search by name">
+                    <button type="submit">Search</button>
+                    </form>
     <!-- tampilin tabel dari tabel pelanggan -->
-
+        
     <h2>Data Pemasok</h2>
 
     <?php
@@ -215,7 +218,35 @@
     if (!$result_pemasok) {
         die("Error dalam query SQL: " . $conn->error);
     }
-    
+    // Prepare and execute the search query
+    $sql = $conn->prepare("SELECT * FROM pemasok WHERE nama LIKE ?");
+    $likeSearch = "%" . $search . "%";
+    $sql->bind_param("s", $likeSearch);
+    $sql->execute();
+    $result = $sql->get_result();
+
+    // Display the results
+    if ($result->num_rows > 0) {
+        echo "<table border='1'>
+                <tr>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>Alamat</th>
+                    <th>Telepon</th>
+                </tr>";
+        while ($row = $result->fetch_assoc()) {
+            echo "<tr>
+                    <td>{$row['id']}</td>
+                    <td>{$row['nama']}</td>
+                    <td>{$row['alamat']}</td>
+                    <td>{$row['telepon']}</td>
+                  </tr>";
+        }
+        echo "</table>";
+    } else {
+        echo "No pemasok found";
+    }
+
     // Menampilkan tabel pemasok
     if ($result_pemasok->num_rows > 0) {
         echo '<h2>Data Pemasok</h2>';

@@ -191,7 +191,10 @@
                 <!-- /.container-fluid -->
 
     <!-- tampilin tabel dari tabel pelanggan -->
-
+    <form method="POST" action="">
+        <input type="text" name="search" placeholder="Search by name">
+        <button type="submit">Search</button>
+    </form>
     <h2>Data REKENING</h2>
 
     <?php
@@ -215,7 +218,34 @@
     if (!$result_rekening) {
         die("Error dalam query SQL: " . $conn->error);
     }
-    
+    // Prepare and execute the search query
+    $sql = $conn->prepare("SELECT * FROM rekening WHERE nama LIKE ?");
+    $likeSearch = "%" . $search . "%";
+    $sql->bind_param("s", $likeSearch);
+    $sql->execute();
+    $result = $sql->get_result();
+
+    // Display the results
+    if ($result->num_rows > 0) {
+        echo "<table border='1'>
+                <tr>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>Nomor Rekening</th>
+                    <th>Bank</th>
+                </tr>";
+        while ($row = $result->fetch_assoc()) {
+            echo "<tr>
+                    <td>{$row['id']}</td>
+                    <td>{$row['nama']}</td>
+                    <td>{$row['nomor_rekening']}</td>
+                    <td>{$row['bank']}</td>
+                  </tr>";
+        }
+        echo "</table>";
+    } else {
+        echo "No rekening found";
+    }
     // Menampilkan tabel rekening
     if ($result_rekening->num_rows > 0) {
         echo '<h2>Data Rekening</h2>';

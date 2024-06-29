@@ -185,7 +185,6 @@
                     
                 </div>
                 <!-- /.container-fluid -->
-                <h3>Search Pelanggan</h3>
                     <form method="POST" action="">
                     <input type="text" name="search" placeholder="Search by name">
                     <button type="submit">Search</button>

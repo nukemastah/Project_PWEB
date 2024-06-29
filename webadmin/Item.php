@@ -189,13 +189,13 @@
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                         <i class="fa fa-bars"></i>
                     </button>
+                   
+            </div>
+        </div>
                     <form method="POST" action="">
                     <input type="text" name="search" placeholder="Search by name">
                     <button type="submit">Search</button>
-            </form>
-            </div>
-        </div>
-
+                    </form>
     <!-- tampilin tabel dari tabel pelanggan -->
 
     <?php
