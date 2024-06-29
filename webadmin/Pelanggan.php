@@ -182,11 +182,16 @@
                         <i class="fa fa-bars"></i>
                     </button>
                     <h2>PELANGGAN</h2>
+                    
                 </div>
                 <!-- /.container-fluid -->
-
+                <h3>Search Pelanggan</h3>
+                    <form method="POST" action="">
+                    <input type="text" name="search" placeholder="Search by name">
+                    <button type="submit">Search</button>
+                    </form>
     <!-- tampilin tabel dari tabel pelanggan -->
-
+                   
     <h2>Data Pelanggan</h2>
 
     <?php
@@ -210,7 +215,34 @@
     if (!$result) {
         die("Error dalam query SQL: " . $conn->error);
     }
+    // Prepare and execute the search query
+    $sql = $conn->prepare("SELECT * FROM pelanggan WHERE nama LIKE ?");
+    $likeSearch = "%" . $search . "%";
+    $sql->bind_param("s", $likeSearch);
+    $sql->execute();
+    $result = $sql->get_result();
 
+    // Display the results
+    if ($result->num_rows > 0) {
+        echo "<table border='1'>
+                <tr>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>Alamat</th>
+                    <th>Telepon</th>
+                </tr>";
+        while ($row = $result->fetch_assoc()) {
+            echo "<tr>
+                    <td>{$row['id']}</td>
+                    <td>{$row['nama']}</td>
+                    <td>{$row['alamat']}</td>
+                    <td>{$row['telepon']}</td>
+                  </tr>";
+        }
+        echo "</table>";
+    } else {
+        echo "No pelanggan found";
+    }
     // Memeriksa apakah ada data
     if ($result->num_rows > 0) {
         echo '<table>
