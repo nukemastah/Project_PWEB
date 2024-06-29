@@ -112,13 +112,28 @@
                 <!-- KONTEN KITA -->
                 <div class="pasang-konten">
                     <div class="button-container">
-                        <div class="tombol-fungsi">disini search</div>
-                        <div class="tombol-fungsi">disini add</div>
-                    </div>
-                    <!-- TAMPIL TABEL -->
-                    <div class="kontentabel">
+                        <div class="tombol-fungsi">
+
+                            <form method="POST" action="">
+                                <input type="text" name="search" placeholder="Search by name">
+                                <button type="submit">Search</button>
+                            </form>
+
+                            </div>
+                            <div class="tombol-fungsi">disini add</div>
+                        </div>
+                        <!-- TAMPIL TABEL -->
+                        <div class="kontentabel">
                         <h2>Data Pelanggan</h2>
+
                         <?php
+                        // Database connection
+                        $servername = "localhost";
+                        $username = "root";
+                        $password = "";
+                        $dbname = "project_pweb";
+                        $conn = new mysqli($servername, $username, $password, $dbname);
+                    
                         // Database connection
                         $servername = "localhost";
                         $username = "root";
@@ -131,28 +146,34 @@
                             die("Koneksi gagal: " . $conn->connect_error);
                         }
 
-                        // SQL query
-                        $sql_pelanggan = "SELECT * FROM pelanggan";
-                        $result_pelanggan = $conn->query($sql_pelanggan);
+                        // Handle search
+                        $search = isset($_POST['search']) ? $_POST['search'] : '';
 
-                        if (!$result_pelanggan) {
-                            die("Error dalam query SQL: " . $conn->error);
+                        if (!empty($search)) {
+                            $sql = $conn->prepare("SELECT * FROM pelanggan WHERE namapelanggan LIKE ?");
+                            $likeSearch = "%" . $search . "%";
+                            $sql->bind_param("s", $likeSearch);
+                            $sql->execute();
+                            $result = $sql->get_result();
+                        } else {
+                            $sql_pelanggan = "SELECT * FROM pelanggan";
+                            $result = $conn->query($sql_pelanggan);
                         }
 
                         // Display table
-                        if ($result_pelanggan->num_rows > 0) {
+                        if ($result->num_rows > 0) {
                             echo '<table>
                                     <thead>
                                         <tr>';
                             // Table headers
-                            $fields_pelanggan = $result_pelanggan->fetch_fields();
+                            $fields_pelanggan = $result->fetch_fields();
                             foreach ($fields_pelanggan as $field) {
                                 echo "<th>{$field->name}</th>";
                             }
                             echo "<th>Aksi</th></tr></thead><tbody>";
 
                             // Table rows
-                            while ($row = $result_pelanggan->fetch_assoc()) {
+                            while ($row = $result->fetch_assoc()) {
                                 echo "<tr>";
                                 foreach ($row as $key => $value) {
                                     echo "<td>$value</td>";
@@ -167,6 +188,35 @@
                         } else {
                             echo "<p>Tidak ada data ditemukan</p>";
                         }
+
+                        // Display table [UNTUK TABEL]
+                        // if ($result_pelanggan->num_rows > 0) {
+                        //     echo '<table>
+                        //             <thead>
+                        //                 <tr>';
+                        //     // Table headers
+                        //     $fields_pelanggan = $result_pelanggan->fetch_fields();
+                        //     foreach ($fields_pelanggan as $field) {
+                        //         echo "<th>{$field->name}</th>";
+                        //     }
+                        //     echo "<th>Aksi</th></tr></thead><tbody>";
+
+                        //     // Table rows
+                        //     while ($row = $result_pelanggan->fetch_assoc()) {
+                        //         echo "<tr>";
+                        //         foreach ($row as $key => $value) {
+                        //             echo "<td>$value</td>";
+                        //         }
+                        //         echo "<td class='actions'>
+                        //                 <a class='edit' href='?action=edit&kodepelanggan={$row['kodepelanggan']}'>Edit</a>
+                        //                 <a class='delete' href='?action=hapus&kodepelanggan={$row['kodepelanggan']}' onclick='return confirm(\"Anda yakin ingin menghapus data ini?\");'>Hapus</a>
+                        //             </td>";
+                        //         echo "</tr>";
+                        //     }
+                        //     echo '</tbody></table>';
+                        // } else {
+                        //     echo "<p>Tidak ada data ditemukan</p>";
+                        // }
 
                         // Close connection
                         $conn->close();
