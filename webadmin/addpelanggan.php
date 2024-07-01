@@ -13,59 +13,74 @@
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
     <style>
-        .pasang-konten {
-            border: 5px;
-            background-color: lightblue;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
             padding: 20px;
-        }
-        .button-container {
             display: flex;
-            gap: 10px; /* Memberi jarak antara tombol */
-            justify-content: flex-start; /* Mengatur posisi tombol ke kiri */
-        }
-        .tombol-fungsi1 {
-            width: 290px;
-            height: 50px;
-            border: 5px;
-
-            color: white;
-            display: flex;
-            align-items: center;
             justify-content: center;
-        }
-        .tombol-fungsi2 {
-            width: 150px;
-            height: 50px;
-            border: 5px;
-            margin-left: -60px;
-            color: white;
-            display: flex;
             align-items: center;
-            justify-content: center;
+            flex-direction: column;
         }
-        .kontentabel {
-            border: 5px;
-            background-color: white;
-            text-align: center;
+        h2 {
+            color: #333;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        form input, form button {
+            width: calc(100% - 22px);
             padding: 10px;
-            margin-top: 20px; /* Tambahkan margin-top untuk jarak dengan tombol */
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        form button {
+            background: #333;
+            color: #fff;
+            cursor: pointer;
+        }
+        form button:hover {
+            background: #555;
         }
         table {
             width: 100%;
+            max-width: 1000px;
             border-collapse: collapse;
-            margin: 0 auto;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
         }
         th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-        th {
-            background-color: #f2f2f2;
+            padding: 10px;
             text-align: left;
         }
+        th {
+            background: #f4f4f4;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
         .actions a {
-            margin-right: 5px;
             text-decoration: none;
+            padding: 5px 10px;
+            color: #fff;
+            border-radius: 3px;
+            margin-right: 5px;
+        }
+        .actions a.edit {
+            background: #007bff;
+        }
+        .actions a.delete {
+            background: #dc3545;
         }
     </style>
 </head>
@@ -122,21 +137,21 @@
                 <!-- KONTEN KITA -->
                 <div class="pasang-konten">
                     <div class="button-container">
-                        <div class="tombol-fungsi1">
 
-                            <form method="POST" action="">
-                                <input type="text" name="search" placeholder="Search by name">
-                                <button type="submit">Search</button>
-                            </form>
-
-                        </div>
-                            <div class="tombol-fungsi2">
-                                <a href="addpelanggan.php"><button>ADD</button></a>
-                            </div>
-                    </div>
-                        <!-- TAMPIL TABEL -->
-                        <div class="kontentabel">
-                        <h2>Data Pelanggan</h2>
+                        <h2><?php echo isset($item) ? 'Edit Item' : 'Tambah Pelanggan'; ?></h2>
+                    <form method="POST">
+                        <input type="hidden" name="action" value="<?php echo isset($item) ? 'edit' : 'tambah'; ?>">
+                        <?php if (isset($item)): ?>
+                            <input type="hidden" name="kodeitem" value="<?php echo $item['kodeitem']; ?>">
+                        <?php endif; ?>
+                        Kode Item: <input type="text" name="kodeitem" value="<?php echo isset($item) ? $item['kodeitem'] : ''; ?>" <?php echo isset($item) ? 'readonly' : ''; ?> required><br>
+                        Nama: <input type="text" name="nama" value="<?php echo isset($item) ? $item['nama'] : ''; ?>" required><br>
+                        Harga Beli: <input type="number" name="hargabeli" value="<?php echo isset($item) ? $item['hargabeli'] : ''; ?>" required><br>
+                        Harga Jual: <input type="number" name="hargajual" value="<?php echo isset($item) ? $item['hargajual'] : ''; ?>" required><br>
+                        Stok: <input type="number" name="stok" value="<?php echo isset($item) ? $item['stok'] : ''; ?>" required><br>
+                        Satuan: <input type="text" name="satuan" value="<?php echo isset($item) ? $item['satuan'] : ''; ?>" required><br>
+                        <button type="submit"><?php echo isset($item) ? 'Update' : 'Tambah'; ?></button>
+                    </form>
 
                         <?php
                         // Database connection
@@ -151,48 +166,7 @@
                             die("Koneksi gagal: " . $conn->connect_error);
                         }
 
-                        // Handle search
-                        $search = isset($_POST['search']) ? $_POST['search'] : '';
 
-                        if (!empty($search)) {
-                            $sql = $conn->prepare("SELECT * FROM pelanggan WHERE namapelanggan LIKE ?");
-                            $likeSearch = "%" . $search . "%";
-                            $sql->bind_param("s", $likeSearch);
-                            $sql->execute();
-                            $result = $sql->get_result();
-                        } else {
-                            $sql_pelanggan = "SELECT * FROM pelanggan";
-                            $result = $conn->query($sql_pelanggan);
-                        }
-
-                        // Display table
-                        if ($result->num_rows > 0) {
-                            echo '<table>
-                                    <thead>
-                                        <tr>';
-                            // Table headers
-                            $fields_pelanggan = $result->fetch_fields();
-                            foreach ($fields_pelanggan as $field) {
-                                echo "<th>{$field->name}</th>";
-                            }
-                            echo "<th>Aksi</th></tr></thead><tbody>";
-
-                            // Table rows
-                            while ($row = $result->fetch_assoc()) {
-                                echo "<tr>";
-                                foreach ($row as $key => $value) {
-                                    echo "<td>$value</td>";
-                                }
-                                echo "<td class='actions'>
-                                        <a class='edit' href='?action=edit&kodepelanggan={$row['kodepelanggan']}'>Edit</a>
-                                        <a class='delete' href='?action=hapus&kodepelanggan={$row['kodepelanggan']}' onclick='return confirm(\"Anda yakin ingin menghapus data ini?\");'>Hapus</a>
-                                    </td>";
-                                echo "</tr>";
-                            }
-                            echo '</tbody></table>';
-                        } else {
-                            echo "<p>Tidak ada data ditemukan</p>";
-                        }
 
                         // Display table [UNTUK TABEL]
                         // if ($result_pelanggan->num_rows > 0) {
