@@ -15,7 +15,6 @@
     <style>
         .pasang-konten {
             border: 5px;
-            background-color: lightblue;
             padding: 20px;
         }
         .button-container {
@@ -45,7 +44,6 @@
         }
         .kontentabel {
             border: 5px;
-            background-color: white;
             text-align: center;
             padding: 10px;
             margin-top: 20px; /* Tambahkan margin-top untuk jarak dengan tombol */
@@ -75,7 +73,7 @@
         <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
                 <div class="sidebar-brand-icon rotate-n-15"></div>
                 <div class="sidebar-brand-text mx-3">ADMIN</div>
             </a>
@@ -83,7 +81,7 @@
             <hr class="sidebar-divider my-0">
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
-                <a class="nav-link" href="index.html"><span>Dashboard</span></a>
+                <a class="nav-link" href="index.php"><span>Dashboard</span></a>
             </li>
             <!-- Divider -->
             <hr class="sidebar-divider">
@@ -107,7 +105,7 @@
             <!-- Heading -->
             <div class="sidebar-heading">TRANSAKSI</div>
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#"><span>Transaksi</span></a>
+                <a class="nav-link collapsed" href="Transaksi.php"><span>Transaksi</span></a>
             </li>
         </ul>
         <!-- End of Sidebar -->
@@ -146,9 +144,37 @@
                         $dbname = "project_pweb";
                         $conn = new mysqli($servername, $username, $password, $dbname);
 
+                        
                         // Check connection
                         if ($conn->connect_error) {
                             die("Koneksi gagal: " . $conn->connect_error);
+                        }
+
+                        $dsn = "mysql:host=$servername;dbname=$dbname";
+                        $options = [
+                            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                            PDO::ATTR_EMULATE_PREPARES => false,
+                        ];
+                        $pdo = new PDO($dsn, $username, $password, $options);
+
+                            // Menghapus data
+                        if (isset($_GET['action']) && $_GET['action'] === 'hapus' && isset($_GET['kodepelanggan'])) {
+                            $kodepelanggan = $_GET['kodepelanggan'];
+
+                            $stmt = $pdo->prepare("DELETE FROM pelanggan WHERE kodepelanggan = :kodepelanggan");
+                            $stmt->execute(['kodepelanggan' => $kodepelanggan]);
+
+                            echo "<p>Data berhasil dihapus!</p>";
+                        }
+
+                        // Mengambil data untuk ditampilkan dan diedit
+                        if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['kodepelanggan'])) {
+                            $kodeitem = $_GET['kodepelanggan'];
+
+                            $stmt = $pdo->prepare("SELECT * FROM item WHERE kodepelanggan = :kodepelanggan");
+                            $stmt->execute(['kodepelanggan' => $kodepelanggan]);
+                            $item = $stmt->fetch();
                         }
 
                         // Handle search
@@ -184,7 +210,7 @@
                                     echo "<td>$value</td>";
                                 }
                                 echo "<td class='actions'>
-                                        <a class='edit' href='?action=edit&kodepelanggan={$row['kodepelanggan']}'>Edit</a>
+                                        <a class='edit' href='addpelanggan.php?action=edit&kodepelanggan={$row['kodepelanggan']}'>Edit</a>
                                         <a class='delete' href='?action=hapus&kodepelanggan={$row['kodepelanggan']}' onclick='return confirm(\"Anda yakin ingin menghapus data ini?\");'>Hapus</a>
                                     </td>";
                                 echo "</tr>";
@@ -193,37 +219,6 @@
                         } else {
                             echo "<p>Tidak ada data ditemukan</p>";
                         }
-
-                        // Display table [UNTUK TABEL]
-                        // if ($result_pelanggan->num_rows > 0) {
-                        //     echo '<table>
-                        //             <thead>
-                        //                 <tr>';
-                        //     // Table headers
-                        //     $fields_pelanggan = $result_pelanggan->fetch_fields();
-                        //     foreach ($fields_pelanggan as $field) {
-                        //         echo "<th>{$field->name}</th>";
-                        //     }
-                        //     echo "<th>Aksi</th></tr></thead><tbody>";
-
-                        //     // Table rows
-                        //     while ($row = $result_pelanggan->fetch_assoc()) {
-                        //         echo "<tr>";
-                        //         foreach ($row as $key => $value) {
-                        //             echo "<td>$value</td>";
-                        //         }
-                        //         echo "<td class='actions'>
-                        //                 <a class='edit' href='?action=edit&kodepelanggan={$row['kodepelanggan']}'>Edit</a>
-                        //                 <a class='delete' href='?action=hapus&kodepelanggan={$row['kodepelanggan']}' onclick='return confirm(\"Anda yakin ingin menghapus data ini?\");'>Hapus</a>
-                        //             </td>";
-                        //         echo "</tr>";
-                        //     }
-                        //     echo '</tbody></table>';
-                        // } else {
-                        //     echo "<p>Tidak ada data ditemukan</p>";
-                        // }
-
-                        // Close connection
                         $conn->close();
                         ?>
                     </div>

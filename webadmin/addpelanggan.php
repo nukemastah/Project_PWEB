@@ -13,28 +13,6 @@
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-        h2 {
-            color: #333;
-        }
-        form {
-            background: #fff;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 500px;
-        }
         form input, form button {
             width: calc(100% - 22px);
             padding: 10px;
@@ -50,25 +28,6 @@
         form button:hover {
             background: #555;
         }
-        table {
-            width: 100%;
-            max-width: 1000px;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background: #f4f4f4;
-        }
-        tr:nth-child(even) {
-            background: #f9f9f9;
-        }
         .actions a {
             text-decoration: none;
             padding: 5px 10px;
@@ -76,12 +35,17 @@
             border-radius: 3px;
             margin-right: 5px;
         }
-        .actions a.edit {
-            background: #007bff;
+        form {
+            background: #fff;
+            padding: 20px;
+            /* margin-bottom: px; */
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto; /* Mengatur posisi form menjadi ditengah */
         }
-        .actions a.delete {
-            background: #dc3545;
-        }
+
     </style>
 </head>
 <body id="page-top">
@@ -90,7 +54,7 @@
         <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
                 <div class="sidebar-brand-icon rotate-n-15"></div>
                 <div class="sidebar-brand-text mx-3">ADMIN</div>
             </a>
@@ -98,7 +62,7 @@
             <hr class="sidebar-divider my-0">
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
-                <a class="nav-link" href="index.html"><span>Dashboard</span></a>
+                <a class="nav-link" href="index.php"><span>Dashboard</span></a>
             </li>
             <!-- Divider -->
             <hr class="sidebar-divider">
@@ -122,7 +86,7 @@
             <!-- Heading -->
             <div class="sidebar-heading">TRANSAKSI</div>
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#"><span>Transaksi</span></a>
+                <a class="nav-link collapsed" href="Transaksi.php"><span>Transaksi</span></a>
             </li>
         </ul>
         <!-- End of Sidebar -->
@@ -132,74 +96,80 @@
             <div id="content">
                 <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                    <h2>PELANGGAN</h2>
+                    <h2>TAMBAH DATA PELANGGAN</h2>
                 </nav>
                 <!-- KONTEN KITA -->
                 <div class="pasang-konten">
                     <div class="button-container">
-
-                        <h2><?php echo isset($item) ? 'Edit Item' : 'Tambah Pelanggan'; ?></h2>
                     <form method="POST">
-                        <input type="hidden" name="action" value="<?php echo isset($item) ? 'edit' : 'tambah'; ?>">
-                        <?php if (isset($item)): ?>
-                            <input type="hidden" name="kodeitem" value="<?php echo $item['kodeitem']; ?>">
+                        <input type="hidden" name="action" value="<?php echo isset($pelanggan) ? 'edit' : 'tambah'; ?>">
+                        <?php if (isset($pelanggan)): ?>
+                            <input type="hidden" name="kodepelanggan" value="<?php echo $pelanggan['kodepelanggan']; ?>">
                         <?php endif; ?>
-                        Kode Item: <input type="text" name="kodeitem" value="<?php echo isset($item) ? $item['kodeitem'] : ''; ?>" <?php echo isset($item) ? 'readonly' : ''; ?> required><br>
-                        Nama: <input type="text" name="nama" value="<?php echo isset($item) ? $item['nama'] : ''; ?>" required><br>
-                        Harga Beli: <input type="number" name="hargabeli" value="<?php echo isset($item) ? $item['hargabeli'] : ''; ?>" required><br>
-                        Harga Jual: <input type="number" name="hargajual" value="<?php echo isset($item) ? $item['hargajual'] : ''; ?>" required><br>
-                        Stok: <input type="number" name="stok" value="<?php echo isset($item) ? $item['stok'] : ''; ?>" required><br>
-                        Satuan: <input type="text" name="satuan" value="<?php echo isset($item) ? $item['satuan'] : ''; ?>" required><br>
-                        <button type="submit"><?php echo isset($item) ? 'Update' : 'Tambah'; ?></button>
+                        Kode Pelanggan: <input type="text" name="kodepelanggan" value="<?php echo isset($pelanggan) ? $pelanggan['kodepelanggan'] : ''; ?>" <?php echo isset($pelanggan) ? 'readonly' : ''; ?> required><br>
+                        Nama Pelanggan: <input type="text" name="namapelanggan" value="<?php echo isset($pelanggan) ? $pelanggan['namapelanggan'] : ''; ?>" required><br>
+                        Alamat: <input type="text" name="alamat" value="<?php echo isset($pelanggan) ? $pelanggan['alamat'] : ''; ?>" required><br>
+                        Kota: <input type="text" name="kota" value="<?php echo isset($pelanggan) ? $pelanggan['kota'] : ''; ?>" required><br>
+                        Telepon: <input type="text" name="telepon" value="<?php echo isset($pelanggan) ? $pelanggan['telepon'] : ''; ?>" required><br>
+                        Email: <input type="email" name="email" value="<?php echo isset($pelanggan) ? $pelanggan['email'] : ''; ?>" required><br>
+                        <button type="submit"><?php echo isset($pelanggan) ? 'Update' : 'Tambah'; ?></button>
                     </form>
-
-                        <?php
-                        // Database connection
+                    <?php
                         $servername = "localhost";
                         $username = "root";
                         $password = "";
                         $dbname = "project_pweb";
+
+                        // Create connection
                         $conn = new mysqli($servername, $username, $password, $dbname);
 
                         // Check connection
                         if ($conn->connect_error) {
-                            die("Koneksi gagal: " . $conn->connect_error);
+                            die("Connection failed: " . $conn->connect_error);
                         }
 
+                        // Process form submission
+                        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                            $action = $_POST['action'];
+                            $kodepelanggan = $_POST['kodepelanggan'];
+                            $namapelanggan = $_POST['namapelanggan'];
+                            $alamat = $_POST['alamat'];
+                            $kota = $_POST['kota'];
+                            $telepon = $_POST['telepon'];
+                            $email = $_POST['email'];
 
+                            if ($action == "tambah") {
+                                // SQL untuk menambah data pelanggan
+                                $sql = "INSERT INTO pelanggan (kodepelanggan, namapelanggan, alamat, kota, telepon, email)
+                                        VALUES ('$kodepelanggan', '$namapelanggan', '$alamat', '$kota', '$telepon', '$email')";
+                            } else if ($action == "edit") {
+                                // SQL untuk mengupdate data pelanggan
+                                $sql = "UPDATE pelanggan SET namapelanggan='$namapelanggan', alamat='$alamat', kota='$kota', telepon='$telepon', email='$email'
+                                        WHERE kodepelanggan='$kodepelanggan'";
+                            }
 
-                        // Display table [UNTUK TABEL]
-                        // if ($result_pelanggan->num_rows > 0) {
-                        //     echo '<table>
-                        //             <thead>
-                        //                 <tr>';
-                        //     // Table headers
-                        //     $fields_pelanggan = $result_pelanggan->fetch_fields();
-                        //     foreach ($fields_pelanggan as $field) {
-                        //         echo "<th>{$field->name}</th>";
-                        //     }
-                        //     echo "<th>Aksi</th></tr></thead><tbody>";
+                            if ($conn->query($sql) === TRUE) {
+                                echo "Data berhasil " . ($action == "tambah" ? "ditambahkan" : "diperbarui") . "!";
+                            } else {
+                                echo "Error: " . $sql . "<br>" . $conn->error;
+                            }
+                        }
 
-                        //     // Table rows
-                        //     while ($row = $result_pelanggan->fetch_assoc()) {
-                        //         echo "<tr>";
-                        //         foreach ($row as $key => $value) {
-                        //             echo "<td>$value</td>";
-                        //         }
-                        //         echo "<td class='actions'>
-                        //                 <a class='edit' href='?action=edit&kodepelanggan={$row['kodepelanggan']}'>Edit</a>
-                        //                 <a class='delete' href='?action=hapus&kodepelanggan={$row['kodepelanggan']}' onclick='return confirm(\"Anda yakin ingin menghapus data ini?\");'>Hapus</a>
-                        //             </td>";
-                        //         echo "</tr>";
-                        //     }
-                        //     echo '</tbody></table>';
-                        // } else {
-                        //     echo "<p>Tidak ada data ditemukan</p>";
-                        // }
+                        // Ambil data pelanggan untuk pengeditan
+                        if (isset($_GET['kodepelanggan'])) {
+                            $kodepelanggan = $_GET['kodepelanggan'];
+                            $sql = "SELECT * FROM pelanggan WHERE kodepelanggan='$kodepelanggan'";
+                            $result = $conn->query($sql);
 
-                        // Close connection
+                            if ($result->num_rows > 0) {
+                                $pelanggan = $result->fetch_assoc();
+                            }
+                        }
+
+                        // Tutup koneksi
                         $conn->close();
-                        ?>
+                    ?>
+
                     </div>
                 </div>
             </div>

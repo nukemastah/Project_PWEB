@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layout</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #0B0B33;
+            color: #FFF;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .table-container, .form-container {
+            background-color: #5E5E0C;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .table-container {
+            display: flex;
+            flex-direction: column;
+            width: 400px;
+        }
+        .table-container input {
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #FFF;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 200px;
+        }
+        .form-container input {
+            padding: 10px;
+        }
+        .form-container button {
+            padding: 10px;
+            background-color: #FFF;
+            border: none;
+            cursor: pointer;
+        }
+        .footer {
+            margin-top: 20px;
+            width: 100%;
+            text-align: center;
+            color: #FFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="table-container">
+            <input type="text" placeholder="Search...">
+            <table>
+                <tr>
+                    <th>Header 1</th>
+                    <th>Header 2</th>
+                    <th>Header 3</th>
+                </tr>
+                <tr>
+                    <td>Data 1</td>
+                    <td>Data 2</td>
+                    <td>Data 3</td>
+                </tr>
+                <tr>
+                    <td>Data 4</td>
+                    <td>Data 5</td>
+                    <td>Data 6</td>
+                </tr>
+                <!-- Add more rows as needed -->
+            </table>
+        </div>
+        <div class="form-container">
+            <input type="text" placeholder="Field 1">
+            <input type="text" placeholder="Field 2">
+            <input type="text" placeholder="Field 3">
+            <input type="text" placeholder="Field 4">
+            <input type="text" placeholder="Field 5">
+            <div style="display: flex; gap: 10px;">
+                <button>Button 1</button>
+                <button>Button 2</button>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        Footer Text
+    </div>
+</body>
+</html>
