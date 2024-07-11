@@ -132,8 +132,13 @@ if ($query) {
             <!-- Heading -->
             <div class="sidebar-heading">TRANSAKSI</div>
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                    <span>Transaksi</span>
+                <a class="nav-link collapsed" href="TransaksiJual.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <span>Transaksi Jual</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="TransaksiBeli.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <span>Transaksi Beli</span>
                 </a>
             </li>
         </ul>
@@ -165,7 +170,7 @@ if ($query) {
 
                         <!-- Generate PDF Button -->
                         <form action="generate_pdf.php" method="POST">
-                            <button class="btn btn-success" style="background-color: #4e73df; margin-left: 450px;" type="submit">Generate PDF</button>
+                            <button class="btn btn-success" style="background-color: #4e73df; margin-left: 480px;" type="submit">Generate PDF</button>
                         </form>
                     </div>
                 </nav>

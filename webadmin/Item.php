@@ -107,7 +107,14 @@
             <!-- Heading -->
             <div class="sidebar-heading">TRANSAKSI</div>
             <li class="nav-item">
-                <a class="nav-link collapsed" href="Transaksi.php"><span>Transaksi</span></a>
+                <a class="nav-link collapsed" href="TransaksiJual.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <span>Transaksi Jual</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="TransaksiBeli.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <span>Transaksi Beli</span>
+                </a>
             </li>
         </ul>
         <!-- End of Sidebar -->
