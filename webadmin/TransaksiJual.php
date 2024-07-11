@@ -86,6 +86,7 @@
         }
     </style>
 </head>
+
 <body id="page-top">
     <div id="wrapper">
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -111,7 +112,6 @@
             <li class="nav-item">
                 <a class="nav-link collapsed" href="Rekening.php"><span>Rekening</span></a>
             </li>
-            <!-- Heading -->
             <div class="sidebar-heading">TRANSAKSI</div>
             <li class="nav-item">
                 <a class="nav-link collapsed" href="TransaksiJual.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
@@ -120,8 +120,7 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link collapsed" href="TransaksiBeli.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                    <span>Transaksi Beli</span>
-                </a>
+                    <span>Transaksi Beli</span></a>
             </li>
         </ul>
         <div id="content-wrapper" class="d-flex flex-column">
@@ -133,7 +132,7 @@
                     <h4>CHECKOUT</h4>
                     <div class="container">
                         <div class="content-container">
-                            <div class="left-container">
+                            <div class="left-container" id="TABELITEM">
                                 <table id="itemTable">
                                     <thead>
                                         <tr>
@@ -153,6 +152,10 @@
                                         </tr>
                                     </tfoot>
                                 </table>
+                                <form action="generatepdf-jual.php" method="POST">
+                                    <input type="hidden" name="tableData" id="tableDataInput">
+                                    <button class="btn btn-success" style="background-color: #4e73df; margin-left: 480px;" type="submit">Generate PDF</button>
+                                </form>
                             </div>
                             <div class="right-container">
                                 <div class="container mt-5">
@@ -182,7 +185,6 @@
                                             </div>
                                             <div class="button-container">
                                                 <button type="submit" class="btn btn-primary">Tambahkan</button>
-                                                <a href="generate_pdf.php" class="btn btn-success">Checkout</a>
                                             </div>
                                         </form>
                                     </div>
@@ -205,6 +207,8 @@
     <script src="js/demo/chart-area-demo.js"></script>
     <script src="js/demo/chart-pie-demo.js"></script>
     <script>
+        let tableData = [];
+
         $(document).ready(function() {
             $('#searchForm').on('submit', function(e) {
                 e.preventDefault();
@@ -248,25 +252,35 @@
                     <td><button onclick="deleteRow(this)" class="btn btn-danger">Hapus</button></td>
                 `;
                 document.querySelector('#itemTable tbody').appendChild(newRow);
+
+                tableData.push({ kodeitem, nama, qty, hargajual });
                 updateTotal();
+                updateTableDataInput();
             } else {
                 alert("Please fill all fields and ensure quantity is at least 1");
             }
         }
 
         function deleteRow(button) {
-            button.closest('tr').remove();
+            let row = button.closest('tr');
+            let index = Array.from(row.parentNode.children).indexOf(row);
+            row.remove();
+
+            tableData.splice(index, 1);
             updateTotal();
+            updateTableDataInput();
         }
 
         function updateTotal() {
             let total = 0;
-            document.querySelectorAll('#itemTable tbody tr').forEach(row => {
-                let qty = parseFloat(row.cells[2].innerText);
-                let price = parseFloat(row.cells[3].innerText);
-                total += qty * price;
+            tableData.forEach(item => {
+                total += parseFloat(item.qty) * parseFloat(item.hargajual);
             });
             document.getElementById('totalValue').innerText = total.toFixed(2);
+        }
+
+        function updateTableDataInput() {
+            document.getElementById('tableDataInput').value = JSON.stringify(tableData);
         }
     </script>
 </body>

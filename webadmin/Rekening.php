@@ -67,6 +67,14 @@
             margin-right: 5px;
             text-decoration: none;
         }
+        .edit-form {
+            display: none; /* Sembunyikan form edit secara default */
+        }
+        .edit-form input[type="text"] {
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body id="page-top">
@@ -107,7 +115,14 @@
             <!-- Heading -->
             <div class="sidebar-heading">TRANSAKSI</div>
             <li class="nav-item">
-                <a class="nav-link collapsed" href="Transaksi.php"><span>Transaksi</span></a>
+                <a class="nav-link collapsed" href="TransaksiJual.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <span>Transaksi Jual</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="TransaksiBeli.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <span>Transaksi Beli</span>
+                </a>
             </li>
         </ul>
         <!-- End of Sidebar -->
@@ -123,19 +138,17 @@
                 <div class="pasang-konten">
                     <div class="button-container">
                         <div class="tombol-fungsi1">
-
                             <form method="POST" action="">
                                 <input type="text" name="search" placeholder="Search by name">
                                 <button type="submit">Search</button>
                             </form>
-
                         </div>
-                            <div class="tombol-fungsi2">
-                                <a href="addrekening.php"><button>ADD</button></a>
-                            </div>
+                        <div class="tombol-fungsi2">
+                            <a href="addrekening.php"><button>ADD</button></a>
+                        </div>
                     </div>
-                        <!-- TAMPIL TABEL -->
-                        <div class="kontentabel">
+                    <!-- TAMPIL TABEL -->
+                    <div class="kontentabel">
                         <h2>Data Rekening</h2>
 
                         <?php
@@ -158,24 +171,13 @@
                                 PDO::ATTR_EMULATE_PREPARES => false,
                             ];
                             $pdo = new PDO($dsn, $username, $password, $options);
-    
-                                // Menghapus data
+
+                            // Menghapus data
                             if (isset($_GET['action']) && $_GET['action'] === 'hapus' && isset($_GET['koderekening'])) {
                                 $koderekening = $_GET['koderekening'];
-    
-                                $stmt = $pdo->prepare("DELETE FROM pelanggan WHERE koderekening = :koderekening");
+                                $stmt = $pdo->prepare("DELETE FROM rekening WHERE koderekening = :koderekening");
                                 $stmt->execute(['koderekening' => $koderekening]);
-    
                                 echo "<p>Data berhasil dihapus!</p>";
-                            }
-    
-                            // Mengambil data untuk ditampilkan dan diedit
-                            if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['koderekening'])) {
-                                $kodeitem = $_GET['koderekening'];
-    
-                                $stmt = $pdo->prepare("SELECT * FROM rekening WHERE koderekening = :koderekening");
-                                $stmt->execute(['koderekening' => $koderekening]);
-                                $item = $stmt->fetch();
                             }
 
                             // Handle search
@@ -212,8 +214,17 @@
                                             <td>{$row['namarekening']}</td>
                                             <td>{$row['saldo']}</td>
                                             <td class='actions'>
-                                                <a class='edit' href='addrekening.php?action=edit&koderekening={$row['koderekening']}'>Edit</a>
+                                                <a class='edit' href='javascript:void(0);' onclick='editRow({$row['koderekening']});'>Edit</a>
                                                 <a class='delete' href='?action=hapus&koderekening={$row['koderekening']}' onclick='return confirm(\"Anda yakin ingin menghapus data ini?\");'>Hapus</a>
+                                            </td>
+                                        </tr>";
+                                    // Edit form row
+                                    echo "<tr class='edit-form' id='edit-{$row['koderekening']}'>
+                                            <td><input type='text' name='edit-nama-{$row['koderekening']}' value='{$row['namarekening']}'></td>
+                                            <td><input type='text' name='edit-saldo-{$row['koderekening']}' value='{$row['saldo']}'></td>
+                                            <td>
+                                                <button onclick='saveEdit({$row['koderekening']});'>Save</button>
+                                                <button onclick='cancelEdit({$row['koderekening']});'>Cancel</button>
                                             </td>
                                         </tr>";
                                 }
@@ -225,7 +236,6 @@
 
                             $conn->close();
                         ?>
-
                     </div>
                 </div>
             </div>
@@ -248,5 +258,41 @@
     <!-- Page level custom scripts -->
     <script src="js/demo/chart-area-demo.js"></script>
     <script src="js/demo/chart-pie-demo.js"></script>
+    <script>
+        function editRow(koderekening) {
+            // Hide all edit forms first
+            $('.edit-form').hide();
+            // Show the selected edit form
+            $('#edit-' + koderekening).show();
+        }
+
+        function saveEdit(koderekening) {
+            // AJAX request to update the record
+            var namaRekening = $('input[name="edit-nama-' + koderekening + '"]').val();
+            var saldo = $('input[name="edit-saldo-' + koderekening + '"]').val();
+
+            $.ajax({
+                type: 'POST',
+                url: 'update-rekening.php', // Buat file ini untuk menangani penyimpanan data
+                data: {
+                    koderekening: koderekening,
+                    namarekening: namaRekening,
+                    saldo: saldo
+                },
+                success: function(response) {
+                    alert('Data berhasil disimpan!');
+                    location.reload(); // Reload halaman setelah penyimpanan sukses
+                },
+                error: function(xhr, status, error) {
+                    alert('Terjadi kesalahan: ' + error);
+                }
+            });
+        }
+
+        function cancelEdit(koderekening) {
+            // Hide the edit form
+            $('#edit-' + koderekening).hide();
+        }
+    </script>
 </body>
 </html>
