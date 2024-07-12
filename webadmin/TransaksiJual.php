@@ -112,7 +112,7 @@
             <li class="nav-item">
                 <a class="nav-link collapsed" href="Rekening.php"><span>Rekening</span></a>
             </li>
-            <div class="sidebar-heading">TRANSAKSI</div>
+            <div class="sidebar-heading">TRANSAKS JUALI</div>
             <li class="nav-item">
                 <a class="nav-link collapsed" href="TransaksiJual.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
                     <span>Transaksi Jual</span>

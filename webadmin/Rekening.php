@@ -1,3 +1,57 @@
+<?php
+// Database connection
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "project_pweb";
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
+}
+
+// Update logic
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ajax'])) {
+    if ($_POST['ajax'] === 'update') {
+        $koderekening_old = $_POST['koderekening_old'];
+        $koderekening = $_POST['koderekening'];
+        $namarekening = $_POST['namarekening'];
+        $saldo = $_POST['saldo'];
+
+        $sql = "UPDATE rekening SET koderekening='$koderekening', namarekening='$namarekening', saldo='$saldo' WHERE koderekening='$koderekening_old'";
+
+        if ($conn->query($sql) === TRUE) {
+            echo "Data berhasil diperbarui!";
+        } else {
+            echo "Terjadi kesalahan saat memperbarui data.";
+        }
+        exit;
+    } elseif ($_POST['ajax'] === 'delete') {
+        $koderekening = $_POST['koderekening'];
+        $stmt = $conn->prepare("DELETE FROM rekening WHERE koderekening = ?");
+        $stmt->bind_param("s", $koderekening);
+        $stmt->execute();
+        echo "Data berhasil dihapus!";
+        exit;
+    }
+}
+
+// Handle search
+$search = isset($_POST['search']) ? $_POST['search'] : '';
+
+if (!empty($search)) {
+    $sql = $conn->prepare("SELECT * FROM rekening WHERE namarekening LIKE ?");
+    $likeSearch = "%" . $search . "%";
+    $sql->bind_param("s", $likeSearch);
+    $sql->execute();
+    $result = $sql->get_result();
+} else {
+    $sql_rekening = "SELECT * FROM rekening";
+    $result = $conn->query($sql_rekening);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,14 +74,13 @@
         }
         .button-container {
             display: flex;
-            gap: 10px; /* Memberi jarak antara tombol */
-            justify-content: flex-start; /* Mengatur posisi tombol ke kiri */
+            gap: 10px;
+            justify-content: flex-start;
         }
         .tombol-fungsi1 {
             width: 290px;
             height: 50px;
             border: 5px;
-
             color: white;
             display: flex;
             align-items: center;
@@ -48,7 +101,7 @@
             background-color: white;
             text-align: center;
             padding: 10px;
-            margin-top: 20px; /* Tambahkan margin-top untuk jarak dengan tombol */
+            margin-top: 20px;
         }
         table {
             width: 100%;
@@ -68,7 +121,7 @@
             text-decoration: none;
         }
         .edit-form {
-            display: none; /* Sembunyikan form edit secara default */
+            display: none;
         }
         .edit-form input[type="text"] {
             width: 100%;
@@ -77,27 +130,20 @@
         }
     </style>
 </head>
+
 <body id="page-top">
-    <!-- Page Wrapper -->
     <div id="wrapper">
-        <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-            <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
                 <div class="sidebar-brand-icon rotate-n-15"></div>
                 <div class="sidebar-brand-text mx-3">ADMIN</div>
             </a>
-            <!-- Divider -->
             <hr class="sidebar-divider my-0">
-            <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
                 <a class="nav-link" href="index.php"><span>Dashboard</span></a>
             </li>
-            <!-- Divider -->
             <hr class="sidebar-divider">
-            <!-- Heading -->
             <div class="sidebar-heading">UTAMA</div>
-            <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
                 <a class="nav-link collapsed" href="Pelanggan.php"><span>Pelanggan</span></a>
             </li>
@@ -110,9 +156,7 @@
             <li class="nav-item">
                 <a class="nav-link collapsed" href="Rekening.php"><span>Rekening</span></a>
             </li>
-            <!-- Divider -->
             <hr class="sidebar-divider">
-            <!-- Heading -->
             <div class="sidebar-heading">TRANSAKSI</div>
             <li class="nav-item">
                 <a class="nav-link collapsed" href="TransaksiJual.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
@@ -125,16 +169,11 @@
                 </a>
             </li>
         </ul>
-        <!-- End of Sidebar -->
-        <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
-            <!-- Main Content -->
             <div id="content">
-                <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
                     <h2>REKENING</h2>
                 </nav>
-                <!-- KONTEN KITA -->
                 <div class="pasang-konten">
                     <div class="button-container">
                         <div class="tombol-fungsi1">
@@ -144,155 +183,101 @@
                             </form>
                         </div>
                         <div class="tombol-fungsi2">
-                            <a href="addrekening.php"><button>ADD</button></a>
+                            <a href="addrekening.php"><button type="button">ADD</button></a>
                         </div>
                     </div>
-                    <!-- TAMPIL TABEL -->
                     <div class="kontentabel">
                         <h2>Data Rekening</h2>
-
                         <?php
-                            // Database connection
-                            $servername = "localhost";
-                            $username = "root";
-                            $password = "";
-                            $dbname = "project_pweb";
-                            $conn = new mysqli($servername, $username, $password, $dbname);
-
-                            // Check connection
-                            if ($conn->connect_error) {
-                                die("Koneksi gagal: " . $conn->connect_error);
+                        if ($result->num_rows > 0) {
+                            echo '<table>
+                                    <thead>
+                                        <tr>
+                                            <th>Kode Rekening</th>
+                                            <th>Nama Rekening</th>
+                                            <th>Saldo</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>';
+                            while ($row = $result->fetch_assoc()) {
+                                echo "<tr id='row-{$row['koderekening']}'>
+                                        <td>{$row['koderekening']}</td>
+                                        <td>{$row['namarekening']}</td>
+                                        <td>{$row['saldo']}</td>
+                                        <td class='actions'>
+                                            <a class='edit' href='javascript:void(0);' onclick='editRow({$row['koderekening']});'>Edit</a>
+                                            <a class='delete' href='javascript:void(0);' onclick='deleteRow({$row['koderekening']});'>Hapus</a>
+                                        </td>
+                                    </tr>";
+                                echo "<tr class='edit-form' id='edit-{$row['koderekening']}'>
+                                        <td><input type='text' id='edit-koderekening-{$row['koderekening']}' value='{$row['koderekening']}'></td>
+                                        <td><input type='text' id='edit-namarekening-{$row['koderekening']}' value='{$row['namarekening']}'></td>
+                                        <td><input type='text' id='edit-saldo-{$row['koderekening']}' value='{$row['saldo']}'></td>
+                                        <td class='actions'>
+                                            <button onclick='saveRow({$row['koderekening']});'>Save</button>
+                                            <button onclick='cancelEdit({$row['koderekening']});'>Cancel</button>
+                                        </td>
+                                    </tr>";
                             }
-
-                            $dsn = "mysql:host=$servername;dbname=$dbname";
-                            $options = [
-                                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                                PDO::ATTR_EMULATE_PREPARES => false,
-                            ];
-                            $pdo = new PDO($dsn, $username, $password, $options);
-
-                            // Menghapus data
-                            if (isset($_GET['action']) && $_GET['action'] === 'hapus' && isset($_GET['koderekening'])) {
-                                $koderekening = $_GET['koderekening'];
-                                $stmt = $pdo->prepare("DELETE FROM rekening WHERE koderekening = :koderekening");
-                                $stmt->execute(['koderekening' => $koderekening]);
-                                echo "<p>Data berhasil dihapus!</p>";
-                            }
-
-                            // Handle search
-                            $search = isset($_POST['search']) ? $_POST['search'] : '';
-
-                            if (!empty($search)) {
-                                $sql = $conn->prepare("SELECT * FROM rekening WHERE namarekening LIKE ?");
-                                $likeSearch = "%" . $search . "%";
-                                $sql->bind_param("s", $likeSearch);
-                                $sql->execute();
-                                $result = $sql->get_result();
-                            } else {
-                                $sql_rekening = "SELECT * FROM rekening";
-                                $result = $conn->query($sql_rekening);
-                            }
-
-                            // Display table
-                            if ($result->num_rows > 0) {
-                                echo '<table>
-                                        <thead>
-                                            <tr>
-                                                <th>Kode Rekening</th>
-                                                <th>Nama Rekening</th>
-                                                <th>Saldo</th>
-                                                <th>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>';
-
-                                // Table rows
-                                while ($row = $result->fetch_assoc()) {
-                                    echo "<tr>
-                                            <td>{$row['koderekening']}</td>
-                                            <td>{$row['namarekening']}</td>
-                                            <td>{$row['saldo']}</td>
-                                            <td class='actions'>
-                                                <a class='edit' href='javascript:void(0);' onclick='editRow({$row['koderekening']});'>Edit</a>
-                                                <a class='delete' href='?action=hapus&koderekening={$row['koderekening']}' onclick='return confirm(\"Anda yakin ingin menghapus data ini?\");'>Hapus</a>
-                                            </td>
-                                        </tr>";
-                                    // Edit form row
-                                    echo "<tr class='edit-form' id='edit-{$row['koderekening']}'>
-                                            <td><input type='text' name='edit-nama-{$row['koderekening']}' value='{$row['namarekening']}'></td>
-                                            <td><input type='text' name='edit-saldo-{$row['koderekening']}' value='{$row['saldo']}'></td>
-                                            <td>
-                                                <button onclick='saveEdit({$row['koderekening']});'>Save</button>
-                                                <button onclick='cancelEdit({$row['koderekening']});'>Cancel</button>
-                                            </td>
-                                        </tr>";
-                                }
-
-                                echo '</tbody></table>';
-                            } else {
-                                echo "<p>Tidak ada data ditemukan</p>";
-                            }
-
-                            $conn->close();
+                            echo '</tbody></table>';
+                        } else {
+                            echo "0 results";
+                        }
                         ?>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- End of Page Wrapper -->
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
-    <!-- Bootstrap core JavaScript-->
+    <!-- JavaScript -->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- Core plugin JavaScript-->
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-    <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
-    <!-- Page level plugins -->
-    <script src="vendor/chart.js/Chart.min.js"></script>
-    <!-- Page level custom scripts -->
-    <script src="js/demo/chart-area-demo.js"></script>
-    <script src="js/demo/chart-pie-demo.js"></script>
     <script>
         function editRow(koderekening) {
-            // Hide all edit forms first
-            $('.edit-form').hide();
-            // Show the selected edit form
-            $('#edit-' + koderekening).show();
-        }
-
-        function saveEdit(koderekening) {
-            // AJAX request to update the record
-            var namaRekening = $('input[name="edit-nama-' + koderekening + '"]').val();
-            var saldo = $('input[name="edit-saldo-' + koderekening + '"]').val();
-
-            $.ajax({
-                type: 'POST',
-                url: 'update-rekening.php', // Buat file ini untuk menangani penyimpanan data
-                data: {
-                    koderekening: koderekening,
-                    namarekening: namaRekening,
-                    saldo: saldo
-                },
-                success: function(response) {
-                    alert('Data berhasil disimpan!');
-                    location.reload(); // Reload halaman setelah penyimpanan sukses
-                },
-                error: function(xhr, status, error) {
-                    alert('Terjadi kesalahan: ' + error);
-                }
-            });
+            document.getElementById('row-' + koderekening).style.display = 'none';
+            document.getElementById('edit-' + koderekening).style.display = 'table-row';
         }
 
         function cancelEdit(koderekening) {
-            // Hide the edit form
-            $('#edit-' + koderekening).hide();
+            document.getElementById('edit-' + koderekening).style.display = 'none';
+            document.getElementById('row-' + koderekening).style.display = 'table-row';
+        }
+
+        function saveRow(koderekening) {
+            var koderekening_new = document.getElementById('edit-koderekening-' + koderekening).value;
+            var namarekening = document.getElementById('edit-namarekening-' + koderekening).value;
+            var saldo = document.getElementById('edit-saldo-' + koderekening).value;
+            
+            $.post(window.location.href, {
+                ajax: 'update',
+                koderekening_old: koderekening,
+                koderekening: koderekening_new,
+                namarekening: namarekening,
+                saldo: saldo
+            }, function(response) {
+                alert(response);
+                location.reload();
+            });
+        }
+
+        function deleteRow(koderekening) {
+            if (confirm('Anda yakin ingin menghapus data ini?')) {
+                $.post(window.location.href, {
+                    ajax: 'delete',
+                    koderekening: koderekening
+                }, function(response) {
+                    alert(response);
+                    location.reload();
+                });
+            }
         }
     </script>
 </body>
 </html>
+
+<?php
+$conn->close();
+?>
