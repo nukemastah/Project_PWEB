@@ -19,6 +19,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ajax'])) {
         $namarekening = $_POST['namarekening'];
         $saldo = $_POST['saldo'];
 
+        // Validate saldo
+        if ($saldo < 1) {
+            echo "Saldo tidak bisa kurang dari 1.";
+            exit;
+        }
+
         $sql = "UPDATE rekening SET koderekening='$koderekening', namarekening='$namarekening', saldo='$saldo' WHERE koderekening='$koderekening_old'";
 
         if ($conn->query($sql) === TRUE) {
@@ -51,7 +57,6 @@ if (!empty($search)) {
     $result = $conn->query($sql_rekening);
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -189,6 +194,32 @@ if (!empty($search)) {
                     <div class="kontentabel">
                         <h2>Data Rekening</h2>
                         <?php
+                        // Database connection
+                        $servername = "localhost";
+                        $username = "root";
+                        $password = "";
+                        $dbname = "project_pweb";
+                        $conn = new mysqli($servername, $username, $password, $dbname);
+
+                        // Check connection
+                        if ($conn->connect_error) {
+                            die("Connection failed: " . $conn->connect_error);
+                        }
+
+                        // Handle search
+                        $search = isset($_POST['search']) ? $_POST['search'] : '';
+
+                        if (!empty($search)) {
+                            $sql = $conn->prepare("SELECT * FROM rekening WHERE namarekening LIKE ?");
+                            $likeSearch = "%" . $search . "%";
+                            $sql->bind_param("s", $likeSearch);
+                            $sql->execute();
+                            $result = $sql->get_result();
+                        } else {
+                            $sql_rekening = "SELECT * FROM rekening";
+                            $result = $conn->query($sql_rekening);
+                        }
+
                         if ($result->num_rows > 0) {
                             echo '<table>
                                     <thead>
@@ -206,14 +237,14 @@ if (!empty($search)) {
                                         <td>{$row['namarekening']}</td>
                                         <td>{$row['saldo']}</td>
                                         <td class='actions'>
-                                            <a class='edit' href='javascript:void(0);' onclick='editRow({$row['koderekening']});'>Edit</a>
-                                            <a class='delete' href='javascript:void(0);' onclick='deleteRow({$row['koderekening']});'>Hapus</a>
+                                            <a class='edit' href='#' onclick='editRow(\"{$row['koderekening']}\"); return false;'>Edit</a>
+                                            <a class='delete' href='#' onclick='deleteRow(\"{$row['koderekening']}\"); return false;'>Hapus</a>
                                         </td>
                                     </tr>";
                                 echo "<tr class='edit-form' id='edit-{$row['koderekening']}'>
                                         <td><input type='text' id='edit-koderekening-{$row['koderekening']}' value='{$row['koderekening']}'></td>
                                         <td><input type='text' id='edit-namarekening-{$row['koderekening']}' value='{$row['namarekening']}'></td>
-                                        <td><input type='text' id='edit-saldo-{$row['koderekening']}' value='{$row['saldo']}'></td>
+                                        <td><input type='number' id='edit-saldo-{$row['koderekening']}' value='{$row['saldo']}' min='1'></td>
                                         <td class='actions'>
                                             <button onclick='saveRow({$row['koderekening']});'>Save</button>
                                             <button onclick='cancelEdit({$row['koderekening']});'>Cancel</button>
@@ -224,6 +255,8 @@ if (!empty($search)) {
                         } else {
                             echo "0 results";
                         }
+
+                        $conn->close();
                         ?>
                     </div>
                 </div>
@@ -250,7 +283,13 @@ if (!empty($search)) {
             var koderekening_new = document.getElementById('edit-koderekening-' + koderekening).value;
             var namarekening = document.getElementById('edit-namarekening-' + koderekening).value;
             var saldo = document.getElementById('edit-saldo-' + koderekening).value;
-            
+
+            // Validate saldo
+            if (saldo < 1) {
+                alert('Saldo tidak bisa kurang dari 1.');
+                return;
+            }
+
             $.post(window.location.href, {
                 ajax: 'update',
                 koderekening_old: koderekening,
@@ -277,7 +316,3 @@ if (!empty($search)) {
     </script>
 </body>
 </html>
-
-<?php
-$conn->close();
-?>

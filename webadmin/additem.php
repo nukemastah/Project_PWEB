@@ -86,7 +86,13 @@
             <!-- Heading -->
             <div class="sidebar-heading">TRANSAKSI</div>
             <li class="nav-item">
-                <a class="nav-link collapsed" href="Transaksi.php"><span>Transaksi</span></a>
+                <a class="nav-link collapsed" href="TransaksiJual.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <span>Transaksi Jual</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="TransaksiBeli.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <span>Transaksi Beli</span></a>
             </li>
         </ul>
         <!-- End of Sidebar -->
@@ -138,7 +144,7 @@
                                 $hargajual = $_POST['hargajual'];
                                 $stok = $_POST['stok'];
                                 $satuan = $_POST['satuan'];
-
+                            
                                 if ($action == "tambah") {
                                     // SQL to insert data into item table
                                     $sql = "INSERT INTO item (kodeitem, nama, hargabeli, hargajual, stok, satuan)
@@ -148,9 +154,12 @@
                                     $sql = "UPDATE item SET nama='$nama', hargabeli='$hargabeli', hargajual='$hargajual', stok='$stok', satuan='$satuan'
                                             WHERE kodeitem='$kodeitem'";
                                 }
-
+                            
                                 if ($conn->query($sql) === TRUE) {
-                                    echo "Data berhasil " . ($action == "tambah" ? "ditambahkan" : "diperbarui") . "!";
+                                    echo "<script>
+                                            alert('Data berhasil " . ($action == "tambah" ? "ditambahkan" : "diperbarui") . "!');
+                                            window.location.href = 'Item.php';
+                                          </script>";
                                 } else {
                                     echo "Error: " . $sql . "<br>" . $conn->error;
                                 }

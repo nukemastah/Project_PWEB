@@ -1,3 +1,60 @@
+<?php
+// Database connection
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "project_pweb";
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
+}
+
+// Update logic
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ajax'])) {
+    if ($_POST['ajax'] === 'update') {
+        $kodeitem_old = $_POST['kodeitem_old'];
+        $kodeitem = $_POST['kodeitem'];
+        $nama = $_POST['nama'];
+        $hargabeli = $_POST['hargabeli'];
+        $hargajual = $_POST['hargajual'];
+        $stok = $_POST['stok'];
+        $satuan = $_POST['satuan'];
+
+        $sql = "UPDATE item SET kodeitem='$kodeitem', nama='$nama', hargabeli='$hargabeli', hargajual='$hargajual', stok='$stok', satuan='$satuan' WHERE kodeitem='$kodeitem_old'";
+
+        if ($conn->query($sql) === TRUE) {
+            echo "Data berhasil diperbarui!";
+        } else {
+            echo "Terjadi kesalahan saat memperbarui data.";
+        }
+        exit;
+    } elseif ($_POST['ajax'] === 'delete') {
+        $kodeitem = $_POST['kodeitem'];
+        $stmt = $conn->prepare("DELETE FROM item WHERE kodeitem = ?");
+        $stmt->bind_param("s", $kodeitem);
+        $stmt->execute();
+        echo "Data berhasil dihapus!";
+        exit;
+    }
+}
+
+// Handle search
+$search = isset($_POST['search']) ? $_POST['search'] : '';
+
+if (!empty($search)) {
+    $sql = $conn->prepare("SELECT * FROM item WHERE nama LIKE ?");
+    $likeSearch = "%" . $search . "%";
+    $sql->bind_param("s", $likeSearch);
+    $sql->execute();
+    $result = $sql->get_result();
+} else {
+    $sql_item = "SELECT * FROM item";
+    $result = $conn->query($sql_item);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,14 +77,13 @@
         }
         .button-container {
             display: flex;
-            gap: 10px; /* Memberi jarak antara tombol */
-            justify-content: flex-start; /* Mengatur posisi tombol ke kiri */
+            gap: 10px;
+            justify-content: flex-start;
         }
         .tombol-fungsi1 {
             width: 290px;
             height: 50px;
             border: 5px;
-
             color: white;
             display: flex;
             align-items: center;
@@ -48,7 +104,7 @@
             background-color: white;
             text-align: center;
             padding: 10px;
-            margin-top: 20px; /* Tambahkan margin-top untuk jarak dengan tombol */
+            margin-top: 20px;
         }
         table {
             width: 100%;
@@ -67,29 +123,30 @@
             margin-right: 5px;
             text-decoration: none;
         }
+        .edit-form {
+            display: none;
+        }
+        .edit-form input[type="text"] {
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
     </style>
 </head>
+
 <body id="page-top">
-    <!-- Page Wrapper -->
     <div id="wrapper">
-        <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-            <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
                 <div class="sidebar-brand-icon rotate-n-15"></div>
                 <div class="sidebar-brand-text mx-3">ADMIN</div>
             </a>
-            <!-- Divider -->
             <hr class="sidebar-divider my-0">
-            <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
                 <a class="nav-link" href="index.php"><span>Dashboard</span></a>
             </li>
-            <!-- Divider -->
             <hr class="sidebar-divider">
-            <!-- Heading -->
             <div class="sidebar-heading">UTAMA</div>
-            <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
                 <a class="nav-link collapsed" href="Pelanggan.php"><span>Pelanggan</span></a>
             </li>
@@ -102,9 +159,7 @@
             <li class="nav-item">
                 <a class="nav-link collapsed" href="Rekening.php"><span>Rekening</span></a>
             </li>
-            <!-- Divider -->
             <hr class="sidebar-divider">
-            <!-- Heading -->
             <div class="sidebar-heading">TRANSAKSI</div>
             <li class="nav-item">
                 <a class="nav-link collapsed" href="TransaksiJual.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
@@ -117,147 +172,130 @@
                 </a>
             </li>
         </ul>
-        <!-- End of Sidebar -->
-        <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
-            <!-- Main Content -->
             <div id="content">
-                <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
                     <h2>ITEM</h2>
                 </nav>
-                <!-- KONTEN KITA -->
                 <div class="pasang-konten">
                     <div class="button-container">
                         <div class="tombol-fungsi1">
-
                             <form method="POST" action="">
                                 <input type="text" name="search" placeholder="Search by name">
                                 <button type="submit">Search</button>
                             </form>
-
                         </div>
-                            <div class="tombol-fungsi2">
-                                <a href="additem.php"><button>ADD</button></a>
-                            </div>
+                        <div class="tombol-fungsi2">
+                            <a href="additem.php"><button type="button">ADD</button></a>
+                        </div>
                     </div>
-                        <!-- TAMPIL TABEL -->
-                        <div class="kontentabel">
+                    <div class="kontentabel">
                         <h2>Data Item</h2>
-
                         <?php
-                            // Database connection
-                            $servername = "localhost";
-                            $username = "root";
-                            $password = "";
-                            $dbname = "project_pweb";
-                            $conn = new mysqli($servername, $username, $password, $dbname);
-
-                            // Check connection
-                            if ($conn->connect_error) {
-                                die("Koneksi gagal: " . $conn->connect_error);
+                        if ($result->num_rows > 0) {
+                            echo '<table>
+                                    <thead>
+                                        <tr>
+                                            <th>Kode Item</th>
+                                            <th>Nama</th>
+                                            <th>Harga Beli</th>
+                                            <th>Harga Jual</th>
+                                            <th>Stok</th>
+                                            <th>Satuan</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>';
+                            while ($row = $result->fetch_assoc()) {
+                                echo "<tr id='row-{$row['kodeitem']}'>
+                                        <td>{$row['kodeitem']}</td>
+                                        <td>{$row['nama']}</td>
+                                        <td>{$row['hargabeli']}</td>
+                                        <td>{$row['hargajual']}</td>
+                                        <td>{$row['stok']}</td>
+                                        <td>{$row['satuan']}</td>
+                                        <td class='actions'>
+                                            <a class='edit' href='javascript:void(0);' onclick='editRow({$row['kodeitem']});'>Edit</a>
+                                            <a class='delete' href='javascript:void(0);' onclick='deleteRow({$row['kodeitem']});'>Hapus</a>
+                                        </td>
+                                    </tr>";
+                                echo "<tr class='edit-form' id='edit-{$row['kodeitem']}'>
+                                        <td><input type='text' id='edit-kodeitem-{$row['kodeitem']}' value='{$row['kodeitem']}'></td>
+                                        <td><input type='text' id='edit-nama-{$row['kodeitem']}' value='{$row['nama']}'></td>
+                                        <td><input type='text' id='edit-hargabeli-{$row['kodeitem']}' value='{$row['hargabeli']}'></td>
+                                        <td><input type='text' id='edit-hargajual-{$row['kodeitem']}' value='{$row['hargajual']}'></td>
+                                        <td><input type='text' id='edit-stok-{$row['kodeitem']}' value='{$row['stok']}'></td>
+                                        <td><input type='text' id='edit-satuan-{$row['kodeitem']}' value='{$row['satuan']}'></td>
+                                        <td class='actions'>
+                                            <button onclick='saveRow({$row['kodeitem']});'>Save</button>
+                                            <button onclick='cancelEdit({$row['kodeitem']});'>Cancel</button>
+                                        </td>
+                                    </tr>";
                             }
-
-                            $dsn = "mysql:host=$servername;dbname=$dbname";
-                            $options = [
-                                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                                PDO::ATTR_EMULATE_PREPARES => false,
-                            ];
-                            $pdo = new PDO($dsn, $username, $password, $options);
-    
-                                // Menghapus data
-                            if (isset($_GET['action']) && $_GET['action'] === 'hapus' && isset($_GET['kodeitem'])) {
-                                $kodeitem = $_GET['kodeitem'];
-    
-                                $stmt = $pdo->prepare("DELETE FROM item WHERE kodeitem = :kodeitem");
-                                $stmt->execute(['kodeitem' => $kodeitem]);
-    
-                                echo "<p>Data berhasil dihapus!</p>";
-                            }
-    
-                            // Mengambil data untuk ditampilkan dan diedit
-                            if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['kodeitem'])) {
-                                $kodeitem = $_GET['kodeitem'];
-    
-                                $stmt = $pdo->prepare("SELECT * FROM item WHERE kodeitem = :kodeitem");
-                                $stmt->execute(['kodeitem' => $kodeitem]);
-                                $item = $stmt->fetch();
-                            }
-
-                            // Handle search
-                            $search = isset($_POST['search']) ? $_POST['search'] : '';
-
-                            if (!empty($search)) {
-                                $sql = $conn->prepare("SELECT * FROM item WHERE nama LIKE ?");
-                                $likeSearch = "%" . $search . "%";
-                                $sql->bind_param("s", $likeSearch);
-                                $sql->execute();
-                                $result = $sql->get_result();
-                            } else {
-                                $sql_item = "SELECT * FROM item";
-                                $result = $conn->query($sql_item);
-                            }
-
-                            // Display table
-                            if ($result->num_rows > 0) {
-                                echo '<table>
-                                        <thead>
-                                            <tr>
-                                                <th>Kode Item</th>
-                                                <th>Nama</th>
-                                                <th>Harga Beli</th>
-                                                <th>Harga Jual</th>
-                                                <th>Stok</th>
-                                                <th>Satuan</th>
-                                                <th>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>';
-
-                                // Table rows
-                                while ($row = $result->fetch_assoc()) {
-                                    echo "<tr>";
-                                    echo "<td>{$row['kodeitem']}</td>";
-                                    echo "<td>{$row['nama']}</td>";
-                                    echo "<td>{$row['hargabeli']}</td>";
-                                    echo "<td>{$row['hargajual']}</td>";
-                                    echo "<td>{$row['stok']}</td>";
-                                    echo "<td>{$row['satuan']}</td>";
-                                    echo "<td class='actions'>
-                                            <a class='edit' href='additem.php?action=edit&kodeitem={$row['kodeitem']}'>Edit</a>
-                                            <a class='delete' href='?action=hapus&kodeitem={$row['kodeitem']}' onclick='return confirm(\"Anda yakin ingin menghapus data ini?\");'>Hapus</a>
-                                        </td>";
-                                    echo "</tr>";
-                                }
-                                echo '</tbody></table>';
-                            } else {
-                                echo "<p>Tidak ada data ditemukan</p>";
-                            }
-                            $conn->close();
+                            echo '</tbody></table>';
+                        } else {
+                            echo "0 results";
+                        }
                         ?>
-
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- End of Page Wrapper -->
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
-    <!-- Bootstrap core JavaScript-->
+    <!-- JavaScript -->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- Core plugin JavaScript-->
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-    <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
-    <!-- Page level plugins -->
-    <script src="vendor/chart.js/Chart.min.js"></script>
-    <!-- Page level custom scripts -->
-    <script src="js/demo/chart-area-demo.js"></script>
-    <script src="js/demo/chart-pie-demo.js"></script>
+    <script>
+        function editRow(kodeitem) {
+            document.getElementById('row-' + kodeitem).style.display = 'none';
+            document.getElementById('edit-' + kodeitem).style.display = 'table-row';
+        }
+
+        function cancelEdit(kodeitem) {
+            document.getElementById('edit-' + kodeitem).style.display = 'none';
+            document.getElementById('row-' + kodeitem).style.display = 'table-row';
+        }
+
+        function saveRow(kodeitem) {
+            var kodeitem_new = document.getElementById('edit-kodeitem-' + kodeitem).value;
+            var nama = document.getElementById('edit-nama-' + kodeitem).value;
+            var hargabeli = document.getElementById('edit-hargabeli-' + kodeitem).value;
+            var hargajual = document.getElementById('edit-hargajual-' + kodeitem).value;
+            var stok = document.getElementById('edit-stok-' + kodeitem).value;
+            var satuan = document.getElementById('edit-satuan-' + kodeitem).value;
+            
+            $.post(window.location.href, {
+                ajax: 'update',
+                kodeitem_old: kodeitem,
+                kodeitem: kodeitem_new,
+                nama: nama,
+                hargabeli: hargabeli,
+                hargajual: hargajual,
+                stok: stok,
+                satuan: satuan
+            }, function(response) {
+                alert(response);
+                location.reload();
+            });
+        }
+
+        function deleteRow(kodeitem) {
+            if (confirm('Anda yakin ingin menghapus data ini?')) {
+                $.post(window.location.href, {
+                    ajax: 'delete',
+                    kodeitem: kodeitem
+                }, function(response) {
+                    alert(response);
+                    location.reload();
+                });
+            }
+        }
+    </script>
 </body>
 </html>
+
+<?php
+$conn->close();
+?>

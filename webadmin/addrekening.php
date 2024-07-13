@@ -38,14 +38,12 @@
         form {
             background: #fff;
             padding: 20px;
-            /* margin-bottom: px; */
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             width: 100%;
             max-width: 500px;
-            margin: 0 auto; /* Mengatur posisi form menjadi ditengah */
+            margin: 0 auto;
         }
-
     </style>
 </head>
 <body id="page-top">
@@ -86,7 +84,13 @@
             <!-- Heading -->
             <div class="sidebar-heading">TRANSAKSI</div>
             <li class="nav-item">
-                <a class="nav-link collapsed" href="Transaksi.php"><span>Transaksi</span></a>
+                <a class="nav-link collapsed" href="TransaksiJual.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <span>Transaksi Jual</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="TransaksiBeli.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <span>Transaksi Beli</span></a>
             </li>
         </ul>
         <!-- End of Sidebar -->
@@ -101,7 +105,7 @@
                 <!-- KONTEN KITA -->
                 <div class="pasang-konten">
                     <div class="button-container">
-                        <form method="POST">
+                        <form id="rekeningForm" method="POST">
                             <input type="hidden" name="action" value="<?php echo isset($rekening) ? 'edit' : 'tambah'; ?>">
                             <?php if (isset($rekening)): ?>
                                 <input type="hidden" name="koderekening" value="<?php echo $rekening['koderekening']; ?>">
@@ -144,7 +148,10 @@
                             }
 
                             if ($conn->query($sql) === TRUE) {
-                                echo "Data berhasil " . ($action == "tambah" ? "ditambahkan" : "diperbarui") . "!";
+                                echo "<script>
+                                        alert('Data berhasil " . ($action == "tambah" ? "ditambahkan" : "diperbarui") . "!');
+                                        window.location.href = 'Rekening.php';
+                                      </script>";
                             } else {
                                 echo "Error: " . $sql . "<br>" . $conn->error;
                             }

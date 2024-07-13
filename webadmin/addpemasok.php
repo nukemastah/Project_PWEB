@@ -86,7 +86,13 @@
             <!-- Heading -->
             <div class="sidebar-heading">TRANSAKSI</div>
             <li class="nav-item">
-                <a class="nav-link collapsed" href="Transaksi.php"><span>Transaksi</span></a>
+                <a class="nav-link collapsed" href="TransaksiJual.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <span>Transaksi Jual</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="TransaksiBeli.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <span>Transaksi Beli</span></a>
             </li>
         </ul>
         <!-- End of Sidebar -->
@@ -130,6 +136,7 @@
                         }
 
                         // Process form submission
+                        
                         if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $action = $_POST['action'];
                             $kodepemasok = $_POST['kodepemasok'];
@@ -150,7 +157,10 @@
                             }
 
                             if ($conn->query($sql) === TRUE) {
-                                echo "Data berhasil " . ($action == "tambah" ? "ditambahkan" : "diperbarui") . "!";
+                                echo "<script>
+                                        alert('Data berhasil " . ($action == "tambah" ? "ditambahkan" : "diperbarui") . "!');
+                                        window.location.href = 'Pemasok.php';
+                                    </script>";
                             } else {
                                 echo "Error: " . $sql . "<br>" . $conn->error;
                             }

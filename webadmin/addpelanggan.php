@@ -86,7 +86,13 @@
             <!-- Heading -->
             <div class="sidebar-heading">TRANSAKSI</div>
             <li class="nav-item">
-                <a class="nav-link collapsed" href="Transaksi.php"><span>Transaksi</span></a>
+                <a class="nav-link collapsed" href="TransaksiJual.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <span>Transaksi Jual</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="TransaksiBeli.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <span>Transaksi Beli</span></a>
             </li>
         </ul>
         <!-- End of Sidebar -->
@@ -127,8 +133,6 @@
                         if ($conn->connect_error) {
                             die("Connection failed: " . $conn->connect_error);
                         }
-
-                        // Process form submission
                         if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $action = $_POST['action'];
                             $kodepelanggan = $_POST['kodepelanggan'];
@@ -139,17 +143,20 @@
                             $email = $_POST['email'];
 
                             if ($action == "tambah") {
-                                // SQL untuk menambah data pelanggan
+                                // SQL to insert data into pelanggan table
                                 $sql = "INSERT INTO pelanggan (kodepelanggan, namapelanggan, alamat, kota, telepon, email)
                                         VALUES ('$kodepelanggan', '$namapelanggan', '$alamat', '$kota', '$telepon', '$email')";
                             } else if ($action == "edit") {
-                                // SQL untuk mengupdate data pelanggan
+                                // SQL to update data in pelanggan table
                                 $sql = "UPDATE pelanggan SET namapelanggan='$namapelanggan', alamat='$alamat', kota='$kota', telepon='$telepon', email='$email'
                                         WHERE kodepelanggan='$kodepelanggan'";
                             }
 
                             if ($conn->query($sql) === TRUE) {
-                                echo "Data berhasil " . ($action == "tambah" ? "ditambahkan" : "diperbarui") . "!";
+                                echo "<script>
+                                        alert('Data berhasil " . ($action == "tambah" ? "ditambahkan" : "diperbarui") . "!');
+                                        window.location.href = 'Pelanggan.php';
+                                    </script>";
                             } else {
                                 echo "Error: " . $sql . "<br>" . $conn->error;
                             }

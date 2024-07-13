@@ -1,3 +1,60 @@
+<?php
+// Database connection
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "project_pweb";
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Koneksi gagal: " . $conn->connect_error);
+}
+
+// Update logic
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ajax'])) {
+    if ($_POST['ajax'] === 'update') {
+        $kodepelanggan_old = $_POST['kodepelanggan_old'];
+        $kodepelanggan = $_POST['kodepelanggan'];
+        $namapelanggan = $_POST['namapelanggan'];
+        $alamat = $_POST['alamat'];
+        $kota = $_POST['kota'];
+        $telepon = $_POST['telepon'];
+        $email = $_POST['email'];
+
+        $sql = "UPDATE pelanggan SET kodepelanggan='$kodepelanggan', namapelanggan='$namapelanggan', alamat='$alamat', kota='$kota', telepon='$telepon', email='$email' WHERE kodepelanggan='$kodepelanggan_old'";
+
+        if ($conn->query($sql) === TRUE) {
+            echo "Data berhasil diperbarui!";
+        } else {
+            echo "Terjadi kesalahan saat memperbarui data.";
+        }
+        exit;
+    } elseif ($_POST['ajax'] === 'delete') {
+        $kodepelanggan = $_POST['kodepelanggan'];
+        $stmt = $conn->prepare("DELETE FROM pelanggan WHERE kodepelanggan = ?");
+        $stmt->bind_param("s", $kodepelanggan);
+        $stmt->execute();
+        echo "Data berhasil dihapus!";
+        exit;
+    }
+}
+
+// Handle search
+$search = isset($_POST['search']) ? $_POST['search'] : '';
+
+if (!empty($search)) {
+    $sql = $conn->prepare("SELECT * FROM pelanggan WHERE namapelanggan LIKE ?");
+    $likeSearch = "%" . $search . "%";
+    $sql->bind_param("s", $likeSearch);
+    $sql->execute();
+    $result = $sql->get_result();
+} else {
+    $sql_pelanggan = "SELECT * FROM pelanggan";
+    $result = $conn->query($sql_pelanggan);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,18 +72,18 @@
     <style>
         .pasang-konten {
             border: 5px;
+            background-color: lightblue;
             padding: 20px;
         }
         .button-container {
             display: flex;
-            gap: 10px; /* Memberi jarak antara tombol */
-            justify-content: flex-start; /* Mengatur posisi tombol ke kiri */
+            gap: 10px;
+            justify-content: flex-start;
         }
         .tombol-fungsi1 {
             width: 290px;
             height: 50px;
             border: 5px;
-
             color: white;
             display: flex;
             align-items: center;
@@ -44,9 +101,10 @@
         }
         .kontentabel {
             border: 5px;
+            background-color: white;
             text-align: center;
             padding: 10px;
-            margin-top: 20px; /* Tambahkan margin-top untuk jarak dengan tombol */
+            margin-top: 20px;
         }
         table {
             width: 100%;
@@ -65,29 +123,30 @@
             margin-right: 5px;
             text-decoration: none;
         }
+        .edit-form {
+            display: none;
+        }
+        .edit-form input[type="text"] {
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
     </style>
 </head>
+
 <body id="page-top">
-    <!-- Page Wrapper -->
     <div id="wrapper">
-        <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-            <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
                 <div class="sidebar-brand-icon rotate-n-15"></div>
                 <div class="sidebar-brand-text mx-3">ADMIN</div>
             </a>
-            <!-- Divider -->
             <hr class="sidebar-divider my-0">
-            <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
                 <a class="nav-link" href="index.php"><span>Dashboard</span></a>
             </li>
-            <!-- Divider -->
             <hr class="sidebar-divider">
-            <!-- Heading -->
             <div class="sidebar-heading">UTAMA</div>
-            <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
                 <a class="nav-link collapsed" href="Pelanggan.php"><span>Pelanggan</span></a>
             </li>
@@ -100,9 +159,7 @@
             <li class="nav-item">
                 <a class="nav-link collapsed" href="Rekening.php"><span>Rekening</span></a>
             </li>
-            <!-- Divider -->
             <hr class="sidebar-divider">
-            <!-- Heading -->
             <div class="sidebar-heading">TRANSAKSI</div>
             <li class="nav-item">
                 <a class="nav-link collapsed" href="TransaksiJual.php" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
@@ -115,140 +172,130 @@
                 </a>
             </li>
         </ul>
-        <!-- End of Sidebar -->
-        <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
-            <!-- Main Content -->
             <div id="content">
-                <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
                     <h2>PELANGGAN</h2>
                 </nav>
-                <!-- KONTEN KITA -->
                 <div class="pasang-konten">
                     <div class="button-container">
                         <div class="tombol-fungsi1">
-
                             <form method="POST" action="">
                                 <input type="text" name="search" placeholder="Search by name">
                                 <button type="submit">Search</button>
                             </form>
-
                         </div>
-                            <div class="tombol-fungsi2">
-                                <a href="addpelanggan.php"><button>ADD</button></a>
-                            </div>
+                        <div class="tombol-fungsi2">
+                            <a href="addpelanggan.php"><button type="button">ADD</button></a>
+                        </div>
                     </div>
-                        <!-- TAMPIL TABEL -->
-                        <div class="kontentabel">
+                    <div class="kontentabel">
                         <h2>Data Pelanggan</h2>
-
                         <?php
-                        // Database connection
-                        $servername = "localhost";
-                        $username = "root";
-                        $password = "";
-                        $dbname = "project_pweb";
-                        $conn = new mysqli($servername, $username, $password, $dbname);
-
-                        
-                        // Check connection
-                        if ($conn->connect_error) {
-                            die("Koneksi gagal: " . $conn->connect_error);
-                        }
-
-                        $dsn = "mysql:host=$servername;dbname=$dbname";
-                        $options = [
-                            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                            PDO::ATTR_EMULATE_PREPARES => false,
-                        ];
-                        $pdo = new PDO($dsn, $username, $password, $options);
-
-                            // Menghapus data
-                        if (isset($_GET['action']) && $_GET['action'] === 'hapus' && isset($_GET['kodepelanggan'])) {
-                            $kodepelanggan = $_GET['kodepelanggan'];
-
-                            $stmt = $pdo->prepare("DELETE FROM pelanggan WHERE kodepelanggan = :kodepelanggan");
-                            $stmt->execute(['kodepelanggan' => $kodepelanggan]);
-
-                            echo "<p>Data berhasil dihapus!</p>";
-                        }
-
-                        // Mengambil data untuk ditampilkan dan diedit
-                        if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['kodepelanggan'])) {
-                            $kodeitem = $_GET['kodepelanggan'];
-
-                            $stmt = $pdo->prepare("SELECT * FROM item WHERE kodepelanggan = :kodepelanggan");
-                            $stmt->execute(['kodepelanggan' => $kodepelanggan]);
-                            $item = $stmt->fetch();
-                        }
-
-                        // Handle search
-                        $search = isset($_POST['search']) ? $_POST['search'] : '';
-
-                        if (!empty($search)) {
-                            $sql = $conn->prepare("SELECT * FROM pelanggan WHERE namapelanggan LIKE ?");
-                            $likeSearch = "%" . $search . "%";
-                            $sql->bind_param("s", $likeSearch);
-                            $sql->execute();
-                            $result = $sql->get_result();
-                        } else {
-                            $sql_pelanggan = "SELECT * FROM pelanggan";
-                            $result = $conn->query($sql_pelanggan);
-                        }
-
-                        // Display table
                         if ($result->num_rows > 0) {
                             echo '<table>
                                     <thead>
-                                        <tr>';
-                            // Table headers
-                            $fields_pelanggan = $result->fetch_fields();
-                            foreach ($fields_pelanggan as $field) {
-                                echo "<th>{$field->name}</th>";
-                            }
-                            echo "<th>Aksi</th></tr></thead><tbody>";
-
-                            // Table rows
+                                        <tr>
+                                            <th>Kode Pelanggan</th>
+                                            <th>Nama Pelanggan</th>
+                                            <th>Alamat</th>
+                                            <th>Kota</th>
+                                            <th>Telepon</th>
+                                            <th>Email</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>';
                             while ($row = $result->fetch_assoc()) {
-                                echo "<tr>";
-                                foreach ($row as $key => $value) {
-                                    echo "<td>$value</td>";
-                                }
-                                echo "<td class='actions'>
-                                        <a class='edit' href='addpelanggan.php?action=edit&kodepelanggan={$row['kodepelanggan']}'>Edit</a>
-                                        <a class='delete' href='?action=hapus&kodepelanggan={$row['kodepelanggan']}' onclick='return confirm(\"Anda yakin ingin menghapus data ini?\");'>Hapus</a>
-                                    </td>";
-                                echo "</tr>";
+                                echo "<tr id='row-{$row['kodepelanggan']}'>
+                                        <td>{$row['kodepelanggan']}</td>
+                                        <td>{$row['namapelanggan']}</td>
+                                        <td>{$row['alamat']}</td>
+                                        <td>{$row['kota']}</td>
+                                        <td>{$row['telepon']}</td>
+                                        <td>{$row['email']}</td>
+                                        <td class='actions'>
+                                            <a class='edit' href='javascript:void(0);' onclick='editRow({$row['kodepelanggan']});'>Edit</a>
+                                            <a class='delete' href='javascript:void(0);' onclick='deleteRow({$row['kodepelanggan']});'>Hapus</a>
+                                        </td>
+                                    </tr>
+                                    <tr class='edit-form' id='edit-{$row['kodepelanggan']}'>
+                                        <td><input type='text' id='edit-kodepelanggan-{$row['kodepelanggan']}' value='{$row['kodepelanggan']}'></td>
+                                        <td><input type='text' id='edit-namapelanggan-{$row['kodepelanggan']}' value='{$row['namapelanggan']}'></td>
+                                        <td><input type='text' id='edit-alamat-{$row['kodepelanggan']}' value='{$row['alamat']}'></td>
+                                        <td><input type='text' id='edit-kota-{$row['kodepelanggan']}' value='{$row['kota']}'></td>
+                                        <td><input type='text' id='edit-telepon-{$row['kodepelanggan']}' value='{$row['telepon']}'></td>
+                                        <td><input type='text' id='edit-email-{$row['kodepelanggan']}' value='{$row['email']}'></td>
+                                        <td class='actions'>
+                                            <button onclick='saveRow({$row['kodepelanggan']});'>Save</button>
+                                            <button onclick='cancelEdit({$row['kodepelanggan']});'>Cancel</button>
+                                        </td>
+                                    </tr>";
                             }
                             echo '</tbody></table>';
                         } else {
-                            echo "<p>Tidak ada data ditemukan</p>";
+                            echo "0 results";
                         }
-                        $conn->close();
                         ?>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- End of Page Wrapper -->
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
-    <!-- Bootstrap core JavaScript-->
+    <!-- JavaScript -->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- Core plugin JavaScript-->
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-    <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
-    <!-- Page level plugins -->
-    <script src="vendor/chart.js/Chart.min.js"></script>
-    <!-- Page level custom scripts -->
-    <script src="js/demo/chart-area-demo.js"></script>
-    <script src="js/demo/chart-pie-demo.js"></script>
+    <script>
+        function editRow(kodepelanggan) {
+            document.getElementById('row-' + kodepelanggan).style.display = 'none';
+            document.getElementById('edit-' + kodepelanggan).style.display = 'table-row';
+        }
+
+        function cancelEdit(kodepelanggan) {
+            document.getElementById('edit-' + kodepelanggan).style.display = 'none';
+            document.getElementById('row-' + kodepelanggan).style.display = 'table-row';
+        }
+
+        function saveRow(kodepelanggan) {
+            var kodepelanggan_new = document.getElementById('edit-kodepelanggan-' + kodepelanggan).value;
+            var namapelanggan = document.getElementById('edit-namapelanggan-' + kodepelanggan).value;
+            var alamat = document.getElementById('edit-alamat-' + kodepelanggan).value;
+            var kota = document.getElementById('edit-kota-' + kodepelanggan).value;
+            var telepon = document.getElementById('edit-telepon-' + kodepelanggan).value;
+            var email = document.getElementById('edit-email-' + kodepelanggan).value;
+            
+            $.post(window.location.href, {
+                ajax: 'update',
+                kodepelanggan_old: kodepelanggan,
+                kodepelanggan: kodepelanggan_new,
+                namapelanggan: namapelanggan,
+                alamat: alamat,
+                kota: kota,
+                telepon: telepon,
+                email: email
+            }, function(response) {
+                alert(response);
+                location.reload();
+            });
+        }
+
+        function deleteRow(kodepelanggan) {
+            if (confirm('Anda yakin ingin menghapus data ini?')) {
+                $.post(window.location.href, {
+                    ajax: 'delete',
+                    kodepelanggan: kodepelanggan
+                }, function(response) {
+                    alert(response);
+                    location.reload();
+                });
+            }
+        }
+    </script>
 </body>
 </html>
+
+<?php
+$conn->close();
+?>
