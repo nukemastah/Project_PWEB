@@ -9,7 +9,7 @@ function getHtmlContent($tableData) {
     $html .= '<th>Kode Item</th>';
     $html .= '<th>Nama</th>';
     $html .= '<th>Qty</th>';
-    $html .= '<th>Harga Jual</th>';
+    $html .= '<th>Harga Beli</th>';
     $html .= '<th>Total</th>';
     $html .= '</tr>';
     $html .= '</thead>';
@@ -17,13 +17,13 @@ function getHtmlContent($tableData) {
 
     $totalValue = 0;
     foreach ($tableData as $row) {
-        $total = $row['qty'] * $row['hargajual'];
+        $total = $row['qty'] * $row['hargabeli'];
         $totalValue += $total;
         $html .= '<tr>';
         $html .= '<td>' . $row['kodeitem'] . '</td>';
         $html .= '<td>' . $row['nama'] . '</td>';
         $html .= '<td>' . $row['qty'] . '</td>';
-        $html .= '<td>' . $row['hargajual'] . '</td>';
+        $html .= '<td>' . $row['hargabeli'] . '</td>';
         $html .= '<td>' . $total . '</td>';
         $html .= '</tr>';
     }

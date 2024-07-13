@@ -137,9 +137,10 @@
                                     <thead>
                                         <tr>
                                             <th>Kode Item</th>
+                                            <th>Kode Item</th>
                                             <th>Nama</th>
                                             <th>Qty</th>
-                                            <th>Harga Jual</th>
+                                            <th>Harga Beli</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -180,8 +181,8 @@
                                                 <input type="number" id="qty" name="qty" class="form-control" min="1" value="1">
                                             </div>
                                             <div class="form-group">
-                                                <label for="hargajual">Harga Jual</label>
-                                                <input type="text" id="hargajual" name="hargajual" class="form-control" readonly>
+                                                <label for="hargabeli">Harga Beli</label>
+                                                <input type="text" id="hargabeli" name="hargabeli" class="form-control" readonly>
                                             </div>
                                             <div class="button-container">
                                                 <button type="submit" class="btn btn-primary">Tambahkan</button>
@@ -222,13 +223,13 @@
                             var item = JSON.parse(data);
                             $('#kodeitem').val(item.kodeitem);
                             $('#nama').val(item.nama);
-                            $('#hargajual').val(item.hargajual);
+                            $('#hargabeli').val(item.hargabeli);
                             $('#searchResult').text('');
                         } else {
                             $('#searchResult').text('Item not found');
                             $('#kodeitem').val('');
                             $('#nama').val('');
-                            $('#hargajual').val('');
+                            $('#hargabeli').val('');
                         }
                     }
                 });
@@ -240,20 +241,20 @@
             let kodeitem = document.getElementById('kodeitem').value;
             let nama = document.getElementById('nama').value;
             let qty = document.getElementById('qty').value;
-            let hargajual = document.getElementById('hargajual').value;
+            let hargabeli = document.getElementById('hargabeli').value;
 
-            if (kodeitem && nama && qty >= 1 && hargajual) {
+            if (kodeitem && nama && qty >= 1 && hargabeli) {
                 let newRow = document.createElement('tr');
                 newRow.innerHTML = `
                     <td>${kodeitem}</td>
                     <td>${nama}</td>
                     <td>${qty}</td>
-                    <td>${hargajual}</td>
+                    <td>${hargabeli}</td>
                     <td><button onclick="deleteRow(this)" class="btn btn-danger">Hapus</button></td>
                 `;
                 document.querySelector('#itemTable tbody').appendChild(newRow);
 
-                tableData.push({ kodeitem, nama, qty, hargajual });
+                tableData.push({ kodeitem, nama, qty, hargabeli });
                 updateTotal();
                 updateTableDataInput();
             } else {
@@ -274,7 +275,7 @@
         function updateTotal() {
             let total = 0;
             tableData.forEach(item => {
-                total += parseFloat(item.qty) * parseFloat(item.hargajual);
+                total += parseFloat(item.qty) * parseFloat(item.hargabeli);
             });
             document.getElementById('totalValue').innerText = total.toFixed(2);
         }
