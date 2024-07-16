@@ -86,7 +86,20 @@
         }
     </style>
 </head>
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "project_pweb";
 
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
 <body id="page-top">
     <div id="wrapper">
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -127,12 +140,26 @@
             <div id="content">
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
                     <h2>TRANSAKSI</h2>
+                    <form action="generatepdf-jual.php" method="POST">
+                        <input type="hidden" name="tableData" id="tableDataInput">
+                        <button class="btn btn-success" style="background-color: #4e73df; margin-left: 480px;" type="submit">Generate PDF</button>
+                    </form>
                 </nav>
                 <div class="pasang-konten">
                     <h4>CHECKOUT</h4>
                     <div class="container">
                         <div class="content-container">
                             <div class="left-container" id="TABELITEM">
+                                <table border="0">
+                                    <tr>
+                                        <td>Note: <!--BAGIAN SINI AUTO GENERATE AA-000 INCREMENT HINGGA 999 MENJADI AB-->
+                                            <span id="nomorNota"></span>
+                                        </td>
+                                        <td>Rekening: <!--BAGIAN INI MENJADI DROP DOWN OTOMATIS DARI TABEL REKENING YANG DIJADIKAN DROPDOWNNYA ITU NAMA REKENING-->
+                                            <select id="rekening" name="rekening" class="form-control"></select>
+                                        </td>
+                                    </tr>
+                                </table>
                                 <table id="itemTable">
                                     <thead>
                                         <tr>
@@ -152,10 +179,10 @@
                                         </tr>
                                     </tfoot>
                                 </table>
-                                <form action="generatepdf-jual.php" method="POST">
-                                    <input type="hidden" name="tableData" id="tableDataInput">
-                                    <button class="btn btn-success" style="background-color: #4e73df; margin-left: 480px;" type="submit">Generate PDF</button>
-                                </form>
+                                <button class="btn btn-primary" id="updateSaldo">
+                                    <!--BAGIAN INI TOMBOL CHECKOUT UNTUK SEBUAH FUNGSI PHP-->
+                                    Checkout
+                                </button>
                             </div>
                             <div class="right-container">
                                 <div class="container mt-5">
@@ -209,8 +236,33 @@
     <script>
         let tableData = [];
 
+        let notaCounter = 0;
+        const notaPrefix = 'AA';
+
+        function generateNotaNumber() {
+            const prefix = notaPrefix;
+            const suffix = String(notaCounter).padStart(3, '0');
+            const newNotaNumber = `${prefix}-${suffix}`;
+
+            // Display the nota number
+            $('#nomorNota').text(newNotaNumber);
+
+            // Increment the counter for the next nota number
+            notaCounter++;
+        }
+
         $(document).ready(function() {
-            $('#searchForm').on('submit', function(e) {
+            generateNotaNumber(); // Generate and display the nota number when the page loads
+        });
+
+        $(document).ready(function() {
+            // Generate a unique note number
+            generateNotaNumber();
+            // Populate rekening dropdown
+            populateRekeningDropdown();
+        });
+
+        $('#searchForm').on('submit', function(e) {
                 e.preventDefault();
                 var search = $('#search').val();
                 $.ajax({
@@ -233,7 +285,32 @@
                     }
                 });
             });
-        });
+
+            $('#updateSaldo').on('click', function() {
+                checkout();
+            });
+        
+        function generateNotaNumber() {
+            // Generate a note number (e.g., AA-001, AA-002, ... AB-001, AB-002, ...)
+            // Placeholder implementation, replace with your logic
+            var nomorNota = 'AA-001'; // Example
+            $('#nomorNota').text(nomorNota);
+        }
+
+        function populateRekeningDropdown() {
+            // Fetch rekening data and populate the dropdown
+            $.ajax({
+                url: 'fetch_rekening.php', // Replace with your PHP script to fetch rekening data
+                type: 'GET',
+                success: function(data) {
+                    var rekeningDropdown = $('#rekening');
+                    var rekeningList = JSON.parse(data);
+                    rekeningList.forEach(function(rekening) {
+                        rekeningDropdown.append('<option value="' + rekening.kode + '">' + rekening.nama + '</option>');
+                    });
+                }
+            });
+        }
 
         function addItem(event) {
             event.preventDefault();
@@ -281,6 +358,63 @@
 
         function updateTableDataInput() {
             document.getElementById('tableDataInput').value = JSON.stringify(tableData);
+        }
+
+        function populateRekeningDropdown() {
+            $.ajax({
+                url: 'fetch_rekening.php', // Replace with your PHP script to fetch rekening data
+                type: 'GET',
+                success: function(data) {
+                    var rekeningDropdown = $('#rekening');
+                    var rekeningList = JSON.parse(data);
+                    rekeningList.forEach(function(rekening) {
+                        rekeningDropdown.append('<option value="' + rekening.kode + '">' + rekening.nama + '</option>');
+                    });
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            generateNotaNumber(); // Generate and display the nota number when the page loads
+            populateRekeningDropdown(); // Populate rekening dropdown
+        });
+
+        function checkout() {
+            // Handle checkout logic
+            // Placeholder for actual checkout function
+            $.ajax({
+                url: 'checkout.php', // Replace with your PHP script to handle checkout
+                type: 'POST',
+                data: { tableData: JSON.stringify(tableData) },
+                success: function(response) {
+                    alert(response);
+                    location.reload(); // Reload page after checkout
+                }
+            });
+        }
+
+        function populateRekeningDropdown() {
+            $.ajax({
+                url: 'fetch_rekening.php', // URL of your PHP script
+                type: 'GET',
+                success: function(data) {
+                    var rekeningDropdown = $('#rekening');
+                    var rekeningList = JSON.parse(data);
+                    
+                    // Check for errors in response
+                    if (rekeningList.error) {
+                        console.error('Error fetching rekening data:', rekeningList.error);
+                        return;
+                    }
+                    
+                    rekeningList.forEach(function(rekening) {
+                        rekeningDropdown.append('<option value="' + rekening.kode + '">' + rekening.nama + '</option>');
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', status, error);
+                }
+            });
         }
     </script>
 </body>
