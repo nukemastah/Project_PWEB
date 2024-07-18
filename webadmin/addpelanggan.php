@@ -107,19 +107,6 @@
                 <!-- KONTEN KITA -->
                 <div class="pasang-konten">
                     <div class="button-container">
-                    <form method="POST">
-                        <input type="hidden" name="action" value="<?php echo isset($pelanggan) ? 'edit' : 'tambah'; ?>">
-                        <?php if (isset($pelanggan)): ?>
-                            <input type="hidden" name="kodepelanggan" value="<?php echo $pelanggan['kodepelanggan']; ?>">
-                        <?php endif; ?>
-                        Kode Pelanggan: <input type="text" name="kodepelanggan" value="<?php echo isset($pelanggan) ? $pelanggan['kodepelanggan'] : ''; ?>" <?php echo isset($pelanggan) ? 'readonly' : ''; ?> required><br>
-                        Nama Pelanggan: <input type="text" name="namapelanggan" value="<?php echo isset($pelanggan) ? $pelanggan['namapelanggan'] : ''; ?>" required><br>
-                        Alamat: <input type="text" name="alamat" value="<?php echo isset($pelanggan) ? $pelanggan['alamat'] : ''; ?>" required><br>
-                        Kota: <input type="text" name="kota" value="<?php echo isset($pelanggan) ? $pelanggan['kota'] : ''; ?>" required><br>
-                        Telepon: <input type="text" name="telepon" value="<?php echo isset($pelanggan) ? $pelanggan['telepon'] : ''; ?>" required><br>
-                        Email: <input type="email" name="email" value="<?php echo isset($pelanggan) ? $pelanggan['email'] : ''; ?>" required><br>
-                        <button type="submit"><?php echo isset($pelanggan) ? 'Update' : 'Tambah'; ?></button>
-                    </form>
                     <?php
                         $servername = "localhost";
                         $username = "root";
@@ -133,6 +120,27 @@
                         if ($conn->connect_error) {
                             die("Connection failed: " . $conn->connect_error);
                         }
+
+                        // Function to generate kode pelanggan
+                        function generateKodePelanggan($conn) {
+                            $sql = "SELECT MAX(kodepelanggan) as max_kode FROM pelanggan";
+                            $result = $conn->query($sql);
+                            $row = $result->fetch_assoc();
+                            $maxKode = $row['max_kode'];
+                            $newKode = 'P' . str_pad(substr($maxKode, 1) + 1, 4, '0', STR_PAD_LEFT);
+                            return $newKode;
+                        }
+
+                        // Function to generate nomor nota
+                        function generateNomorNota($conn) {
+                            $sql = "SELECT MAX(nomornota) as max_nota FROM transaksi";
+                            $result = $conn->query($sql);
+                            $row = $result->fetch_assoc();
+                            $maxNota = $row['max_nota'];
+                            $newNota = 'N' . str_pad(substr($maxNota, 1) + 1, 6, '0', STR_PAD_LEFT);
+                            return $newNota;
+                        }
+
                         if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $action = $_POST['action'];
                             $kodepelanggan = $_POST['kodepelanggan'];
@@ -143,6 +151,7 @@
                             $email = $_POST['email'];
 
                             if ($action == "tambah") {
+                                $kodepelanggan = generateKodePelanggan($conn);
                                 // SQL to insert data into pelanggan table
                                 $sql = "INSERT INTO pelanggan (kodepelanggan, namapelanggan, alamat, kota, telepon, email)
                                         VALUES ('$kodepelanggan', '$namapelanggan', '$alamat', '$kota', '$telepon', '$email')";
@@ -177,16 +186,25 @@
                         $conn->close();
                     ?>
 
-                    </div>
+                    <form method="POST">
+                        <input type="hidden" name="action" value="<?php echo isset($pelanggan) ? 'edit' : 'tambah'; ?>">
+                        <?php if (isset($pelanggan)): ?>
+                            <input type="hidden" name="kodepelanggan" value="<?php echo $pelanggan['kodepelanggan']; ?>">
+                            Kode Pelanggan: <input type="text" value="<?php echo $pelanggan['kodepelanggan']; ?>" readonly><br>
+                        <?php else: ?>
+                            Kode Pelanggan: <input type="text" name="kodepelanggan" value="<?php echo generateKodePelanggan($conn); ?>" readonly required><br>
+                        <?php endif; ?>
+                        Nama Pelanggan: <input type="text" name="namapelanggan" value="<?php echo isset($pelanggan) ? $pelanggan['namapelanggan'] : ''; ?>" required><br>
+                        Alamat: <input type="text" name="alamat" value="<?php echo isset($pelanggan) ? $pelanggan['alamat'] : ''; ?>" required><br>
+                        Kota: <input type="text" name="kota" value="<?php echo isset($pelanggan) ? $pelanggan['kota'] : ''; ?>" required><br>
+                        Telepon: <input type="text" name="telepon" value="<?php echo isset($pelanggan) ? $pelanggan['telepon'] : ''; ?>" required><br>
+                        Email: <input type="email" name="email" value="<?php echo isset($pelanggan) ? $pelanggan['email'] : ''; ?>" required><br>
+                        <button type="submit"><?php echo isset($pelanggan) ? 'Update' : 'Tambah'; ?></button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-    <!-- End of Page Wrapper -->
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -194,10 +212,5 @@
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
-    <!-- Page level plugins -->
-    <script src="vendor/chart.js/Chart.min.js"></script>
-    <!-- Page level custom scripts -->
-    <script src="js/demo/chart-area-demo.js"></script>
-    <script src="js/demo/chart-pie-demo.js"></script>
 </body>
 </html>
